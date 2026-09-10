@@ -12,9 +12,9 @@
          Resource.Endpoints/Mounts/Settings/References over the ambient ResourceContext) and ResourceControlPlane.g.cs (the
          Database default control plane — readiness, health, observed endpoints, stop, Database commands — owned by
          Database.ApplicationModel). Disabled (the default): a plain executable that no gateway can reference. -->
-    <CohesionApplicationModel>enabled</CohesionApplicationModel>  </PropertyGroup>
+    <CohesionApplicationModel>enabled</CohesionApplicationModel>
+  </PropertyGroup>
   <ItemGroup>
     <CohesionSetting Include="Database:Durability" Type="Assimalign.Cohesion.Database.Storage.StorageCommitDurability" Default="synchronous" />
-    <CohesionResourceReference Include="..\Example.AppA.SecretStore\Example.AppA.SecretStore.csproj" />
   </ItemGroup>
 </Project>

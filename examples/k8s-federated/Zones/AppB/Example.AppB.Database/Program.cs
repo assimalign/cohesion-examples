@@ -1,48 +1,44 @@
+using System;
+
 using Assimalign.Cohesion.Database;
 using Assimalign.Cohesion.Database.Hosting;
 using Assimalign.Cohesion.Database.Sql;
 using Assimalign.Cohesion.Database.Storage;
+using Assimalign.Cohesion.Hosting;
 using Example.AppB.Database;
 
-// The appb-database resource, code-first: tables, indexes, constraints, a custom type, a function and a trigger are
-// all C#; schema compile and migrations operate on this model. The Database builder API used here is illustrative — the Database area owns it. What this scaffold fixes is only that the resource is an ordinary executable (Program.cs), that orchestration is the opt-in in the csproj, and that its orchestration-facing facts live there.
 DatabaseApplicationBuilder builder = DatabaseApplication.CreateBuilder(args);
 
-SqlDatabaseEngine engine = builder.AddSqlDatabase(options =>
+await using SqlDatabaseEngine engine = builder.AddSqlDatabase(options =>
 {
-    options.RootPath   = Resource.Mounts.Data;
-    options.Durability = Resource.Settings.DatabaseDurability;
+    options.EngineName = "appb-sql";
+    options.RootPath = Resource.Mounts.Data.Path
+        ?? throw new InvalidOperationException("The database data mount must have a materialized path.");
+    options.Durability = Resource.Settings.DatabaseDurability.Get<StorageCommitDurability>();
 });
 
 builder.AddDatabase(engine, "billing", database =>
 {
-    database.Type<Money>(type => type.Decimal(precision: 18, scale: 2));                          // custom type
-
     database.Table<Invoice>(table =>
     {
-        table.Key(x => x.Id);
-        table.Index(x => x.AccountId); table.Check(x => x.Amount >= 0);
+        table.Key(invoice => invoice.Id);
+        table.Index(invoice => invoice.AccountId);
     });
     database.Table<Payment>(table =>
     {
-        table.Key(x => x.Id);
-        table.References<Invoice>(x => x.InvoiceId);
+        table.Key(payment => payment.Id);
+        table.References<Invoice>(payment => payment.InvoiceId);
     });
-
-    database.Function("invoice_balance", (long invoiceId) => Sql.Scalar<Invoice>(i => i.Amount, i => i.Id == invoiceId) - Sql.Sum<Payment>(p => p.Amount, p => p.InvoiceId == invoiceId));                                 // SQL-callable, defined in C#
-    database.Trigger<Invoice>(TriggerEvent.AfterInsert, (transaction, row) => transaction.Audit("invoice.issued", row.Id));
-
-    database.Principal("appb-api", principal => principal.Grant(Permission.ReadWrite, "Invoices", "Payments"));   // identity is database-scoped
+    database.Principal(
+        "appb-api",
+        principal => principal.Grant(Permission.ReadWrite, "Invoices", "Payments"));
 });
 
-builder.AddSqlServer(engine, server => server.Listen(Resource.Endpoints.Db));
-// The `admin` endpoint (health, readiness, commands) is the Database default control plane, wired by the opt-in.
+builder.AddSqlServer(engine, options => options.Listen(Resource.Endpoints.Db));
 
-await builder.Build().RunAsync();   // provisioning runs before the server accepts (Database.Hosting starts services before servers)
+await using DatabaseApplication application = builder.Build();
+await application.RunAsync();
 
-namespace Example.AppB.Database
-{
-    public sealed record Invoice(long Id, long AccountId, DateTime IssuedAt, DateTime DueAt, decimal Amount, bool Paid);
-    public sealed record Payment(long Id, long InvoiceId, DateTime ReceivedAt, decimal Amount);
-    public readonly record struct Money(decimal Amount);
-}
+internal sealed record Invoice(long Id, long AccountId, DateTime IssuedAt, DateTime DueAt, decimal Amount, bool Paid);
+
+internal sealed record Payment(long Id, long InvoiceId, DateTime ReceivedAt, decimal Amount);

@@ -8,17 +8,17 @@
   -->
   <PropertyGroup>
     <CohesionApplicationName>appa</CohesionApplicationName>
-    <CohesionGateways>Local;InProcess;Docker;Kubernetes</CohesionGateways>   <!-- Kubernetes flows RequiresJit → this executable is JIT; keep a Local-only gateway project if an AOT gateway matters -->
-    <CohesionGatewayInProcess>true</CohesionGatewayInProcess>                <!-- sanctioned composition root: `--gateway inprocess` runs every resource's entry in this process under its own ResourceContext -->
+    <CohesionApplicationModel>enabled</CohesionApplicationModel>
+    <CohesionGateways>Local;InProcess</CohesionGateways>
+    <CohesionGatewayInProcess>true</CohesionGatewayInProcess>                <!-- sanctioned composition root: the in-process gateway runs every resource's entry in this process under its own ResourceContext -->
+    <CohesionResourceReferencesAreRuntime>true</CohesionResourceReferencesAreRuntime>
   </PropertyGroup>
   <ItemGroup>
-    <!-- Roots only; Database and SecretStore arrive transitively through the Api's references. -->
     <CohesionResourceReference Include="..\Example.AppA.Api\Example.AppA.Api.csproj" />
     <CohesionResourceReference Include="..\Example.AppA.Spa\Example.AppA.Spa.csproj" />
-    <!-- Same application, other repo: a worker published as a manifest package by a second appa repo (realized image-only; needs Docker/Kubernetes). -->
-    <CohesionResourceReference Include="Example.AppA.Worker.Manifest" Version="1.4.0" />
-    <!-- A gateway-level crossing into `networking` (generated as Externals.NetworkingRezolvr), used only for the development DNS record command. -->
-    <CohesionResourceReference Include="..\..\..\Networking\Example.Networking.Rezolvr\Example.Networking.Rezolvr.csproj" Optional="true" />
+    <!-- InProcess needs a compile-time entry anchor for each composable member, including transitive members. -->
+    <CohesionResourceReference Include="..\Example.AppA.Database\Example.AppA.Database.csproj" />
+    <CohesionResourceReference Include="..\Example.AppA.SecretStore\Example.AppA.SecretStore.csproj" />
     <Content Include="Configuration\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

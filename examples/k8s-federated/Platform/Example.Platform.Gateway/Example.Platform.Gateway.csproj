@@ -1,8 +1,10 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.Gateway">
   <PropertyGroup>
     <CohesionApplicationName>platform</CohesionApplicationName>
-    <CohesionGateways>Local;InProcess;Docker;Kubernetes</CohesionGateways>
+    <CohesionApplicationModel>enabled</CohesionApplicationModel>
+    <CohesionGateways>Local;InProcess</CohesionGateways>
     <CohesionGatewayInProcess>true</CohesionGatewayInProcess>
+    <CohesionResourceReferencesAreRuntime>true</CohesionResourceReferencesAreRuntime>
   </PropertyGroup>
   <ItemGroup>
     <CohesionResourceReference Include="..\Example.Platform.SecretStore\Example.Platform.SecretStore.csproj" />

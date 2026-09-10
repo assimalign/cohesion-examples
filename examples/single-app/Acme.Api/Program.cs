@@ -1,28 +1,29 @@
+using System;
+using System.Text;
+
 using Acme.Api;
-using Assimalign.Cohesion.Database.Sql.Client;
-using Assimalign.Cohesion.Web;
-using Assimalign.Cohesion.Web.Api;
+using Assimalign.Cohesion.Hosting;
+using Assimalign.Cohesion.Http;
 using Assimalign.Cohesion.Web.Hosting;
-using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+await using WebApplication application = builder.Build();
 
-ISqlClient customers = SqlClient.Create(new SqlClientOptions
+Uri database = Resource.References.AcmeDatabase.Db.Url;
+int pageSize = Resource.Settings.CustomersPageSize.Get<int>();
+
+application.Use(async (context, next) =>
 {
-    Settings = DatabaseConnectionSettings.For(Resource.References.AcmeDatabase.Db.Endpoint, database: "customers", principal: Resource.Name),
-    ConnectionFactory = Resource.References.AcmeDatabase.Db.ConnectionFactory(),   // loopback in-process, TCP elsewhere
+    if (context.Request.Path.Value != "/bindings")
+    {
+        await next.Invoke(context).ConfigureAwait(false);
+        return;
+    }
+
+    context.Response.StatusCode = HttpStatusCode.Ok;
+    byte[] payload = Encoding.UTF8.GetBytes(
+        $"resource={Resource.Name};database={database};pageSize={pageSize}");
+    await context.Response.Body.WriteAsync(payload, context.RequestCancelled).ConfigureAwait(false);
 });
-builder.Services.AddSingleton(customers);
 
-WebApplication app = builder.Build();
-app.UseRouting();
-app.MapGet("/customers", () => customers.Query<Customer>("SELECT * FROM Customers ORDER BY Name LIMIT @take", new { take = Resource.Settings.CustomersPageSize }));
-app.MapGet("/customers/{id}", (long id) => customers.QuerySingle<Customer>("SELECT * FROM Customers WHERE Id = @id", new { id }));
-app.MapPost("/customers", (Customer customer) => customers.Execute("INSERT INTO Customers (Name, Email) VALUES (@Name, @Email)", customer));
-
-await app.RunAsync();
-
-namespace Acme.Api
-{
-    public sealed record Customer(long Id, string Name, string Email);
-}
+await application.RunAsync();

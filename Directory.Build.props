@@ -1,11 +1,18 @@
 <Project>
   <!--
-    Identity only. The Cohesion SDKs set OutputType, TargetFramework, LangVersion, preview features and ImplicitUsings
-    themselves; nothing build-shaped belongs here. Per-area Directory.Build.props files under examples/k8s/ and
+    The identity properties are the intended public shape. The executable defaults below temporarily bridge the
+    10.0.1-preview.3 SDK package, which does not yet apply the consumer defaults described by the design. Per-area Directory.Build.props files under examples/k8s/ and
     examples/k8s-federated/ (Identity/, Networking/, Platform/, Zones/<App>/) import this file and set CohesionApplication
-    once for every resource in their folder; examples/single-app/ is a self-contained org repo and does not import it.
+    once for every resource in their folder; examples/single-app/ imports it and overrides the organization-level values.
   -->
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>Preview</LangVersion>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAotCompatible>true</IsAotCompatible>
     <CohesionOrganization>example</CohesionOrganization>                 <!-- image repository prefix: example/<resource-name> -->
     <CohesionContainerRegistry>ghcr.io/example</CohesionContainerRegistry> <!-- empty = OCI archive on disk only -->
     <VersionPrefix>1.4.0</VersionPrefix>

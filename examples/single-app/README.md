@@ -1,18 +1,17 @@
 # `single-app/` — one repo, one gateway, two resources
 
-The two-person-company story: an API and a database, run as **one process** by default, as containers when wanted, and
-later on Kubernetes without touching application code. Both resources are ordinary executables with a `Program.cs`;
-each opts in to orchestration with one csproj line so `Acme.Gateway` can reference them.
+The two-person-company story is an API and a database using the implemented Local and InProcess gateways. Select Local to
+run the resources as supervised processes, or InProcess to run both inside the gateway process. Both resources are
+ordinary executables with a `Program.cs`, and each opts in to orchestration with one csproj line so `Acme.Gateway` can
+reference it.
 
 ```bash
-dotnet run --project Acme.Gateway                        # one process (InProcess is the default here): Acme.Api + Acme.Database under one gateway
-dotnet run --project Acme.Gateway -- --gateway local     # two supervised processes
-dotnet run --project Acme.Gateway -- --gateway docker    # two containers on network `acme`
-dotnet run --project Acme.Api                            # the API alone, as a plain executable (no gateway; Resource.* falls back to DevPort and appsettings)
-dotnet publish Acme.Gateway -t:CohesionPublishApplication   # images + application.images.json (OCI archives on disk until CohesionContainerRegistry is set)
+dotnet run --project Acme.Gateway -- --gateway local --mode run      # two supervised processes
+dotnet run --project Acme.Gateway -- --gateway inprocess --mode run  # one process; one ResourceContext per resource
+dotnet run --project Acme.Api                                        # standalone executable
 ```
 
-To move to Kubernetes later: add `Kubernetes` to `CohesionGateways` in `Acme.Gateway.csproj` (the gateway executable
-becomes JIT; the resources stay NativeAOT), set `CohesionContainerRegistry` in `Directory.Build.props`, then
-`--gateway kubernetes --mode apply`. Topology 0 — `Acme.Api` alone with `EmbeddedDatabase` and no gateway — is the step
-below this one and is not scaffolded here.
+Docker and Kubernetes remain the target scale-up path, but their gateway-provider packages are not selected by this
+`10.0.1-preview.3.local` scaffold. Once a provider is released, add it to `CohesionGateways`; adding Kubernetes also requires a
+container registry. The resources and their references do not change. Topology 0—`Acme.Api` with an embedded database and
+no gateway—is the step below this scaffold and is not materialized here.

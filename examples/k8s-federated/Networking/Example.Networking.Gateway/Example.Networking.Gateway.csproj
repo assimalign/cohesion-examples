@@ -1,7 +1,8 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.Gateway">
   <PropertyGroup>
     <CohesionApplicationName>networking</CohesionApplicationName>
-    <CohesionGateways>Local;Docker;Kubernetes</CohesionGateways>   <!-- no InProcess: the VPN data plane is composable=false -->
+    <CohesionApplicationModel>enabled</CohesionApplicationModel>
+    <CohesionGateways>Local</CohesionGateways>   <!-- no InProcess: the VPN data plane is composable=false -->
   </PropertyGroup>
   <ItemGroup>
     <CohesionResourceReference Include="..\Example.Networking.Rezolvr\Example.Networking.Rezolvr.csproj" />

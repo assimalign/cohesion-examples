@@ -1,25 +1,39 @@
-using Assimalign.Cohesion.Web;
-using Assimalign.Cohesion.Web.Api;
+using System;
+using System.IO;
+using System.Text;
+
+using Assimalign.Cohesion.Hosting;
+using Assimalign.Cohesion.Hosting.Resources;
+using Assimalign.Cohesion.Http;
 using Assimalign.Cohesion.Web.Hosting;
-using Assimalign.Cohesion.Web.Routing;
-using Assimalign.Cohesion.Web.StaticFiles;
 using Example.AppC.Spa;
 
-// The appc-spa resource: static assets plus the one endpoint the browser needs to find the API.
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-WebApplication app = builder.Build();
-app.UseRouting();
+await using WebApplication application = builder.Build();
 
-// The browser learns endpoints from the resource, never from a hard-coded host: the observed URL of appc-api.
-app.MapGet("/cohesion.config.json", () => new
+byte[] index = File.ReadAllBytes(Path.Combine(
+    ResourceRuntime.Current.ContentRootPath,
+    "wwwroot",
+    "index.html"));
+byte[] configuration = Encoding.UTF8.GetBytes(
+    $"{{\"references\":{{\"appcApi\":{{\"http\":\"{Resource.References.AppCApi.Http.Url}\"}}}}}}");
+
+application.Use(async (context, next) =>
 {
-    references = new { appcApi = new { https = Resource.References.AppCApi.Https.Url } },
+    byte[]? payload = context.Request.Path.Value switch
+    {
+        "/" => index,
+        "/cohesion.config.json" => configuration,
+        _ => null,
+    };
+    if (payload is null)
+    {
+        await next.Invoke(context).ConfigureAwait(false);
+        return;
+    }
+
+    context.Response.StatusCode = HttpStatusCode.Ok;
+    await context.Response.Body.WriteAsync(payload, context.RequestCancelled).ConfigureAwait(false);
 });
 
-app.UseStaticFiles(files =>
-{
-    files.FileSystem = app.ContentRoot.Subdirectory("wwwroot");
-    files.DefaultDocument = "index.html";
-});
-
-await app.RunAsync();
+await application.RunAsync();

@@ -1,28 +1,35 @@
-using Acme.Database;
+using System;
+
 using Assimalign.Cohesion.Database;
 using Assimalign.Cohesion.Database.Hosting;
 using Assimalign.Cohesion.Database.Sql;
+using Assimalign.Cohesion.Hosting;
+using Acme.Database;
 
-// The acme-database resource: a code-first SQL database (the Database builder API is illustrative; the Database area owns it).
 DatabaseApplicationBuilder builder = DatabaseApplication.CreateBuilder(args);
 
-SqlDatabaseEngine engine = builder.AddSqlDatabase(options => options.RootPath = Resource.Mounts.Data);
+await using SqlDatabaseEngine engine = builder.AddSqlDatabase(options =>
+{
+    options.EngineName = "acme-sql";
+    options.RootPath = Resource.Mounts.Data.Path
+        ?? throw new InvalidOperationException("The database data mount must have a materialized path.");
+});
 
 builder.AddDatabase(engine, "customers", database =>
 {
     database.Table<Customer>(table =>
     {
-        table.Key(x => x.Id);
-        table.Unique(x => x.Email);
+        table.Key(customer => customer.Id);
+        table.Index(customer => customer.Email);
     });
-    database.Principal("acme-api", principal => principal.Grant(Permission.ReadWrite, "Customers"));
+    database.Principal(
+        "acme-api",
+        principal => principal.Grant(Permission.ReadWrite, "Customers"));
 });
 
-builder.AddSqlServer(engine, server => server.Listen(Resource.Endpoints.Db));
+builder.AddSqlServer(engine, options => options.Listen(Resource.Endpoints.Db));
 
-await builder.Build().RunAsync();
+await using DatabaseApplication application = builder.Build();
+await application.RunAsync();
 
-namespace Acme.Database
-{
-    public sealed record Customer(long Id, string Name, string Email);
-}
+internal sealed record Customer(long Id, string Name, string Email);

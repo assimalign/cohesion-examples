@@ -10,7 +10,8 @@
          Resource.Endpoints/Mounts/Settings/References over the ambient ResourceContext) and ResourceControlPlane.g.cs (the
          Rezolvr default control plane — readiness, health, observed endpoints, stop, Rezolvr commands — owned by
          Rezolvr.ApplicationModel). Disabled (the default): a plain executable that no gateway can reference. -->
-    <CohesionApplicationModel>enabled</CohesionApplicationModel>  </PropertyGroup>
+    <CohesionApplicationModel>enabled</CohesionApplicationModel>
+  </PropertyGroup>
   <ItemGroup>
     <CohesionEndpoint Update="dns" Public="true" />
     <CohesionResourceReference Include="..\..\Platform\Example.Platform.ConfigurationStore\Example.Platform.ConfigurationStore.csproj" />

@@ -9,7 +9,8 @@
          Resource.Endpoints/Mounts/Settings/References over the ambient ResourceContext) and ResourceControlPlane.g.cs (the
          IdentityHub default control plane — readiness, health, observed endpoints, stop, IdentityHub commands — owned by
          IdentityHub.ApplicationModel). Disabled (the default): a plain executable that no gateway can reference. -->
-    <CohesionApplicationModel>enabled</CohesionApplicationModel>  </PropertyGroup>
+    <CohesionApplicationModel>enabled</CohesionApplicationModel>
+  </PropertyGroup>
   <ItemGroup>
     <CohesionEndpoint Update="https" Public="true" Certificate="tls" />
     <CohesionMount Include="tls" Kind="Secret" Source="platform-secretstore:certs/identity-hub" />

@@ -6,19 +6,16 @@
          Resource.Endpoints/Mounts/Settings/References over the ambient ResourceContext) and ResourceControlPlane.g.cs (the
          Web default control plane — readiness, health, observed endpoints, stop, Web commands — owned by
          Web.ApplicationModel). Disabled (the default): a plain executable that no gateway can reference. -->
-    <CohesionApplicationModel>enabled</CohesionApplicationModel>  </PropertyGroup>
+    <CohesionApplicationModel>enabled</CohesionApplicationModel>
+  </PropertyGroup>
   <ItemGroup>
     <!-- Sdk.Web defaults: endpoint `http` (8080), readiness=http:/readyz and liveness=http:/livez on `http`; the Web default control plane rides `http` under /cohesion/v1/*. Override with Update, never Include. -->
-    <CohesionEndpoint Update="http" Public="false" />
-    <CohesionEndpoint Include="https" Scheme="https" ContainerPort="8443" Public="true" Certificate="tls" />
-    <CohesionProbe Update="readiness" Endpoint="https" Http="/readyz" />
-    <CohesionMount Include="tls" Kind="Secret" Source="appa-secretstore:certs/appa-api" />
+    <CohesionEndpoint Update="http" Public="true" />
     <!-- Gateway-visible defaults (delivered as COHESION_CONFIG__*); the Platform ConfigurationStore can promote a different value at run time. -->
     <CohesionSetting Include="Orders:PageSize" Type="int" Default="50" />
 
-    <!-- Same application (appa): realized by the appa gateway; typed accessors Resource.References.AppADatabase.Db and Resource.References.AppASecretStore.Api. -->
+    <!-- Same application (appa): realized by the appa gateway; typed accessor Resource.References.AppADatabase.Db. -->
     <CohesionResourceReference Include="..\Example.AppA.Database\Example.AppA.Database.csproj" />
-    <CohesionResourceReference Include="..\Example.AppA.SecretStore\Example.AppA.SecretStore.csproj" />
 
     <!-- Other applications (identity, platform): the gateway generates Externals.IdentityHub / Externals.PlatformConfigurationStore for these crossings. -->
     <CohesionResourceReference Include="..\..\..\Identity\Example.Identity.IdentityHub\Example.Identity.IdentityHub.csproj" Optional="true" />

@@ -1,10 +1,15 @@
 # `k8s-federated/` — one cluster per area
 
-The same projects as `k8s/`, minus the root `Gateway/`: each area owns its own Kubernetes gateway and cluster, and areas
-reference each other through their gateways' control planes with `builder.RemoteReference(...)`. Nothing is listed
-twice: a resource's csproj references the remote resource's project (or its `*.Manifest` package), the build generates
-`Externals.<Name>` for the crossing, and the gateway binds it to the peer control plane. Each gateway publishes its own
-control plane at `Cohesion:ControlPlane:PublicUrl` (see its `appsettings.json`).
+The same projects as `k8s/`, minus the root `Gateway/`: each area owns its application boundary. In the target topology,
+areas resolve one another through their gateways' control planes. Nothing is listed twice: a resource's csproj references
+the remote resource's project (or its `*.Manifest` package), and the build generates `Externals.<Name>` for the crossing.
+The pinned package set has no gateway control-plane host yet, so current Programs use static localhost development
+bindings where an endpoint is required and leave optional Identity unbound.
+
+The table is the target multi-cluster placement. The checked-in `10.0.1-preview.3.local` gateway projects select Local,
+plus InProcess for composable applications; Networking remains Local because its VPN data plane is not composable. The
+currently runnable subset is each zone's Database/API/SPA chain. Kubernetes deployment and the `cohesion trust` CLI
+commands arrive with their separate provider and tooling deliverables.
 
 | Area | Cluster | Application / namespace | Gateway | Control plane | Binds to |
 | --- | --- | --- | --- | --- | --- |
@@ -13,33 +18,18 @@ control plane at `Cohesion:ControlPlane:PublicUrl` (see its `appsettings.json`).
 | Networking | `cluster-02` | `networking` | `Example.Networking.Gateway` | `https://networking.example.com/cohesion` | platform |
 | Zones | `cluster-04` | `appa`, `appb`, `appc` | `Example.AppA.Gateway`, `Example.AppB.Gateway`, `Example.AppC.Gateway` | `https://appa.example.com/cohesion`, … | identity, platform |
 
-Trust is explicit and per direction: the application that must **verify** a peer registers that peer's public trust key,
+In that target topology, trust is explicit and per direction: the application that must **verify** a peer registers that peer's public trust key,
 together with the **command kinds** that peer may issue against it (`--allow`); commands from a peer are otherwise refused.
 Platform verifies everyone (mount sources, intermediate-CA enrollment); Identity verifies the zones (client and token
 requests); every application verifies Platform (bootstrap material). Inter-application traffic uses the peers' public
 endpoints over TLS from the org CA.
 
 ```bash
-# 1. Platform — root of trust
-dotnet run --project examples/k8s-federated/Platform/Example.Platform.Gateway -- --gateway kubernetes --context cluster-03 --mode apply
+# generic area manifests can be inspected while their runtime control planes remain upstream work
+dotnet run --project examples/k8s-federated/Platform/Example.Platform.Gateway -- --gateway local --mode describe
+dotnet run --project examples/k8s-federated/Networking/Example.Networking.Gateway -- --gateway local --mode describe
 
-# 2. Identity (needs Platform to trust it, and to trust Platform)
-cohesion trust add identity --from https://identity.example.com/cohesion --against https://platform.example.com/cohesion --allow secretstore.enroll
-cohesion trust add platform --from https://platform.example.com/cohesion --against https://identity.example.com/cohesion
-dotnet run --project examples/k8s-federated/Identity/Example.Identity.Gateway -- --gateway kubernetes --context cluster-01 --mode apply
-
-# 3. Networking
-cohesion trust add networking --from https://networking.example.com/cohesion --against https://platform.example.com/cohesion --allow secretstore.enroll
-cohesion trust add platform   --from https://platform.example.com/cohesion   --against https://networking.example.com/cohesion
-dotnet run --project examples/k8s-federated/Networking/Example.Networking.Gateway -- --gateway kubernetes --context cluster-02 --mode apply
-
-# 4. A zone (Platform, Identity and Networking must trust it for the commands it issues; it must trust Platform)
-cohesion trust add appa     --from https://appa.example.com/cohesion     --against https://platform.example.com/cohesion   --allow secretstore.enroll,configurationstore.namespace
-cohesion trust add appa     --from https://appa.example.com/cohesion     --against https://identity.example.com/cohesion   --allow identityhub.audience,identityhub.client
-cohesion trust add appa     --from https://appa.example.com/cohesion     --against https://networking.example.com/cohesion --allow rezolvr.record
-cohesion trust add platform --from https://platform.example.com/cohesion --against https://appa.example.com/cohesion
-dotnet run --project examples/k8s-federated/Zones/AppA/Example.AppA.Gateway -- --gateway kubernetes --context cluster-04 --mode apply
-
-# pull the AppA zone down onto a laptop while identity and platform stay remote (the RemoteReference bindings in Program.cs apply)
-dotnet run --project examples/k8s-federated/Zones/AppA/Example.AppA.Gateway
+# implemented zone subset
+dotnet run --project examples/k8s-federated/Zones/AppA/Example.AppA.Gateway -- --gateway local --mode run
+dotnet run --project examples/k8s-federated/Zones/AppA/Example.AppA.Gateway -- --gateway inprocess --mode run
 ```

@@ -9,7 +9,8 @@
          Resource.Endpoints/Mounts/Settings/References over the ambient ResourceContext) and ResourceControlPlane.g.cs (the
          VpnGateway default control plane — readiness, health, observed endpoints, stop, VpnGateway commands — owned by
          VpnGateway.ApplicationModel). Disabled (the default): a plain executable that no gateway can reference. -->
-    <CohesionApplicationModel>enabled</CohesionApplicationModel>  </PropertyGroup>
+    <CohesionApplicationModel>enabled</CohesionApplicationModel>
+  </PropertyGroup>
   <ItemGroup>
     <CohesionEndpoint Update="wireguard" Public="true" />
     <CohesionMount Include="keys" Kind="Secret" Source="platform-secretstore:networking/vpn-keys" />
