@@ -1,0 +1,9 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Database">
+	<PropertyGroup>
+		<SignAssembly>True</SignAssembly>
+		<DelaySign>True</DelaySign>
+		<IsAotCompatible>true</IsAotCompatible>
+		<EnablePreviewFeatures>true</EnablePreviewFeatures>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	</PropertyGroup>
+</Project>

@@ -1,0 +1,9 @@
+<Project>
+  <!-- A standalone org repo in miniature (what `dotnet new cohesion-app -n Acme` writes): identity only, and the one
+       application every resource in this repo belongs to. Deliberately does not import the examples root props. -->
+  <PropertyGroup>
+    <CohesionOrganization>acme</CohesionOrganization>
+    <CohesionApplication>acme</CohesionApplication>
+    <VersionPrefix>0.1.0</VersionPrefix>
+  </PropertyGroup>
+</Project>

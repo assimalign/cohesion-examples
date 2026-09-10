@@ -1,0 +1,11 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Gateway">
+  <PropertyGroup>
+    <CohesionApplicationName>acme</CohesionApplicationName>
+    <CohesionGateways>Local;InProcess;Docker</CohesionGateways>   <!-- no Kubernetes package yet → this gateway stays NativeAOT; add it when moving to a cluster -->
+    <CohesionGatewayInProcess>true</CohesionGatewayInProcess>
+    <CohesionGatewayDefault>InProcess</CohesionGatewayDefault>     <!-- `dotnet run` = one process for the smallest business -->
+  </PropertyGroup>
+  <ItemGroup>
+    <CohesionResourceReference Include="..\Acme.Api\Acme.Api.csproj" />   <!-- Acme.Database arrives transitively -->
+  </ItemGroup>
+</Project>
