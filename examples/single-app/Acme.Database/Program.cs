@@ -22,9 +22,8 @@ builder.AddDatabase(engine, "customers", database =>
         table.Key(customer => customer.Id);
         table.Index(customer => customer.Email);
     });
-    database.Principal(
-        "acme-api",
-        principal => principal.Grant(Permission.ReadWrite, "Customers"));
+    // Principals and grants are declared here once the SQL engine can migrate them (Database MVP: runtime
+    // principal mutation). Until then the db endpoint accepts the AllowAll authenticator that ships today.
 });
 
 builder.AddSqlServer(engine, options => options.Listen(Resource.Endpoints.Db));
