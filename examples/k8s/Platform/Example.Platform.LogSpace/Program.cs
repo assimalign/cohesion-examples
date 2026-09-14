@@ -2,7 +2,7 @@ using Assimalign.Cohesion.Hosting;
 using Assimalign.Cohesion.LogSpace;
 using Assimalign.Cohesion.LogSpace.Hosting;
 
-// Owns authenticated OTLP ingestion, durable retention, and the platform query surface.
+// The LogSpace host builder exposes AddService and Build only; no domain-composition verbs yet.
 ILogSpaceApplicationBuilder builder = LogSpaceApplication.CreateBuilder(args);
 
 await builder.Build().RunAsync();

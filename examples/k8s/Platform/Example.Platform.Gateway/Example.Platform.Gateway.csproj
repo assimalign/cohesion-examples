@@ -1,14 +1,14 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.Gateway">
   <PropertyGroup>
     <CohesionApplicationName>platform</CohesionApplicationName>
-    <CohesionApplicationModel>enabled</CohesionApplicationModel>
+    <!-- A gateway is always enabled by Sdk.Gateway. -->
     <CohesionGateways>Local;InProcess</CohesionGateways>
     <CohesionGatewayInProcess>true</CohesionGatewayInProcess>
-    <CohesionResourceReferencesAreRuntime>true</CohesionResourceReferencesAreRuntime>
   </PropertyGroup>
   <ItemGroup>
     <CohesionResourceReference Include="..\Example.Platform.SecretStore\Example.Platform.SecretStore.csproj" />
     <CohesionResourceReference Include="..\Example.Platform.ConfigurationStore\Example.Platform.ConfigurationStore.csproj" />
     <CohesionResourceReference Include="..\Example.Platform.LogSpace\Example.Platform.LogSpace.csproj" />
+    <Content Include="..\Example.Platform.ConfigurationStore\Configuration\shared.json" Link="Configuration\shared.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

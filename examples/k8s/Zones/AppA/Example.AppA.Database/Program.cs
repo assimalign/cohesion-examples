@@ -19,12 +19,12 @@ await using SqlDatabaseEngine engine = builder.AddSqlDatabase(options =>
 
 builder.AddDatabase(engine, "orders", database =>
 {
-    database.Table<Order>(table =>
+    database.Table<Order>("Orders", table =>
     {
         table.Key(order => order.Id);
         table.Index(order => order.CustomerId);
     });
-    database.Table<OrderLine>(table =>
+    database.Table<OrderLine>("OrderLines", table =>
     {
         table.Key(line => line.Id);
         table.References<Order>(line => line.OrderId);

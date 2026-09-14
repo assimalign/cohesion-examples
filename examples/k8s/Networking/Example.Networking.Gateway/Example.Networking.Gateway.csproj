@@ -1,7 +1,7 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.Gateway">
   <PropertyGroup>
     <CohesionApplicationName>networking</CohesionApplicationName>
-    <CohesionApplicationModel>enabled</CohesionApplicationModel>
+    <!-- A gateway is always enabled by Sdk.Gateway. -->
     <CohesionGateways>Local</CohesionGateways>   <!-- no InProcess: the VPN data plane is composable=false -->
   </PropertyGroup>
   <ItemGroup>

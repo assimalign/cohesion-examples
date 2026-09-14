@@ -1,9 +1,9 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.Rezolvr">
   <!-- Rezolvr is the organization's authoritative DNS server (a DNS product — never service discovery; discovery is
-       observed endpoints + Service DNS + gateway control planes). Zones and forwarders are declared in Program.cs;
+       observed endpoints + Service DNS + gateway control planes). The host builder has no zone or forwarder verbs yet;
        forwarders can also be promoted through the Platform ConfigurationStore (crossing → Externals.PlatformConfigurationStore).
-       Default control plane commands: rezolvr.record.
-       Sdk.Rezolvr defaults: endpoint `dns` (udp+tcp 53), endpoint `admin` (http 8081, private; the control plane), mount `data` (Volume, 10Gi). -->
+       Default control plane commands: rezolvr.add-a-record, rezolvr.add-cname-record.
+       Sdk.Rezolvr defaults: endpoints `dns` (dns/udp 53), `dns-tcp` (dns/tcp 53), and `admin` (http 8081; control plane); no mounts; Deployment. -->
   <PropertyGroup>
     <CohesionResourceName>networking-rezolvr</CohesionResourceName>
     <!-- Opt-in to orchestration. Enabled: Sdk.Rezolvr generates resource.json (the manifest), Resource.g.cs (typed accessors:

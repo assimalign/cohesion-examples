@@ -1,10 +1,11 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.Gateway">
   <PropertyGroup>
     <CohesionApplicationName>acme</CohesionApplicationName>
-    <CohesionApplicationModel>enabled</CohesionApplicationModel>
-    <CohesionGateways>Local;InProcess</CohesionGateways>
+    <!-- A gateway is always enabled by Sdk.Gateway. -->
+    <CohesionGateways>Local;InProcess;Docker;Kubernetes</CohesionGateways>
+    <!-- Platforms ship without the Cohesion SDK feed's .local suffix. -->
+    <CohesionPlatformsVersion>10.0.1-preview.3</CohesionPlatformsVersion>
     <CohesionGatewayInProcess>true</CohesionGatewayInProcess>
-    <CohesionResourceReferencesAreRuntime>true</CohesionResourceReferencesAreRuntime>
   </PropertyGroup>
   <ItemGroup>
     <CohesionResourceReference Include="..\Acme.Api\Acme.Api.csproj" />

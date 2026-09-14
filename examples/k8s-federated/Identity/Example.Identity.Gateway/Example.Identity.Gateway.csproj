@@ -1,10 +1,9 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.Gateway">
   <PropertyGroup>
     <CohesionApplicationName>identity</CohesionApplicationName>
-    <CohesionApplicationModel>enabled</CohesionApplicationModel>
+    <!-- A gateway is always enabled by Sdk.Gateway. -->
     <CohesionGateways>Local;InProcess</CohesionGateways>
     <CohesionGatewayInProcess>true</CohesionGatewayInProcess>
-    <CohesionResourceReferencesAreRuntime>true</CohesionResourceReferencesAreRuntime>
   </PropertyGroup>
   <ItemGroup>
     <CohesionResourceReference Include="..\Example.Identity.IdentityHub\Example.Identity.IdentityHub.csproj" />

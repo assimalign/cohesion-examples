@@ -19,12 +19,12 @@ await using SqlDatabaseEngine engine = builder.AddSqlDatabase(options =>
 
 builder.AddDatabase(engine, "billing", database =>
 {
-    database.Table<Invoice>(table =>
+    database.Table<Invoice>("Invoices", table =>
     {
         table.Key(invoice => invoice.Id);
         table.Index(invoice => invoice.AccountId);
     });
-    database.Table<Payment>(table =>
+    database.Table<Payment>("Payments", table =>
     {
         table.Key(payment => payment.Id);
         table.References<Invoice>(payment => payment.InvoiceId);

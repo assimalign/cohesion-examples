@@ -4,13 +4,15 @@
     <CohesionResourceName>appb-api</CohesionResourceName>
     <!-- Opt-in to orchestration. Enabled: Sdk.Web generates resource.json (the manifest), Resource.g.cs (typed accessors:
          Resource.Endpoints/Mounts/Settings/References over the ambient ResourceContext) and ResourceControlPlane.g.cs (the
-         Web default control plane — readiness, health, observed endpoints, stop, Web commands — owned by
+         Web default control plane — readiness, health, observed endpoints, stop; no built-in Web commands — owned by
          Web.ApplicationModel). Disabled (the default): a plain executable that no gateway can reference. -->
     <CohesionApplicationModel>enabled</CohesionApplicationModel>
   </PropertyGroup>
   <ItemGroup>
     <!-- Sdk.Web defaults: endpoint `http` (8080), readiness=http:/readyz and liveness=http:/livez on `http`; the Web default control plane rides `http` under /cohesion/v1/*. Override with Update, never Include. -->
-    <CohesionEndpoint Update="http" Public="true" />
+    <!-- Keep the http endpoint name used by ambient binding and probes, but serve TLS only. -->
+    <CohesionEndpoint Update="http" Scheme="https" Certificate="tls" ContainerPort="8443" Public="true" />
+    <CohesionMount Include="tls" Kind="Secret" Source="appb-secretstore:certs/appb-api" />
     <!-- Gateway-visible defaults (delivered as COHESION_CONFIG__*); the Platform ConfigurationStore can promote a different value at run time. -->
     <CohesionSetting Include="Billing:PageSize" Type="int" Default="50" />
 

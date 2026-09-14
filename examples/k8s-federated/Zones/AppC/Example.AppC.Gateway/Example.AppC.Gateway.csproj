@@ -3,15 +3,16 @@
     One Sdk.Gateway project = one application = one deployment unit = one namespace (appc). A gateway always has
     CohesionApplicationModel enabled (it is itself a resource with a manifest and a control plane). Sdk.Gateway injects the
     orchestration packages, walks the referenced manifests transitively (stopping at application boundaries), and generates
-    Resources.g.cs: Gateway.CreateBuilder(args), AddAppCApi/Spa/Database/SecretStore, AddAllResources, and
+    Gateway.g.cs: Gateway.CreateBuilder(args), AddAppCApi/Spa/Database/SecretStore, AddAllResources, and
     Externals.IdentityHub / Externals.PlatformConfigurationStore for the crossings the Api declares.
   -->
   <PropertyGroup>
     <CohesionApplicationName>appc</CohesionApplicationName>
-    <CohesionApplicationModel>enabled</CohesionApplicationModel>
-    <CohesionGateways>Local;InProcess</CohesionGateways>
+    <!-- A gateway is always enabled by Sdk.Gateway. -->
+    <CohesionGateways>Local;InProcess;Docker;Kubernetes</CohesionGateways>
+    <!-- Platforms ship without the Cohesion SDK feed's .local suffix. -->
+    <CohesionPlatformsVersion>10.0.1-preview.3</CohesionPlatformsVersion>
     <CohesionGatewayInProcess>true</CohesionGatewayInProcess>                <!-- sanctioned composition root: the in-process gateway runs every resource's entry in this process under its own ResourceContext -->
-    <CohesionResourceReferencesAreRuntime>true</CohesionResourceReferencesAreRuntime>
   </PropertyGroup>
   <ItemGroup>
     <CohesionResourceReference Include="..\Example.AppC.Api\Example.AppC.Api.csproj" />

@@ -1,22 +1,19 @@
-# Overview
+# Examples
 
-The idea of cohesion is to be able to deploy a cloud-like platform with built-in resources to a hosting platform like
-Kubernetes, Docker, etc.
+All three scaffolds use packaged Cohesion SDKs, executable `Program.cs` composition, generated manifests and default control planes. Folder-level `CohesionApplication` values express application boundaries.
 
-The concept is a referenced architecture that can be deployed regardless of the hosting model, which is where the
-ApplicationModel implementation comes into play: think of the Azure Landing Zone design areas, created in code, so an
-area can eventually be pulled down while remote aspects of the architecture stay in place. The current package set runs
-the Web/Database zone subset; generic area resources can describe their models but still await runtime control planes.
+| Folder | Projects | Topology |
+| --- | ---: | --- |
+| [single-app](single-app/) | 3 | Acme API/database; Local, InProcess, Docker and Kubernetes providers |
+| [k8s](k8s/) | 25 | Six applications and one Local root application set |
+| [k8s-federated](k8s-federated/) | 24 | The same applications, each independently owned |
 
-| Folder | Topology | Gateways | Namespaces / clusters |
-| --- | --- | --- | --- |
-| `single-app/` | Local → InProcess today; Docker is a later provider | `Acme.Gateway` | N supervised processes or one process |
-| `k8s/` | one target cluster; zone subset runs locally today | root `Example.Gateway` application-set shape + one gateway per area/zone | target namespaces `identity`, `networking`, `platform`, `appa`, `appb`, `appc` |
-| `k8s-federated/` | one target cluster per area; zone subset runs locally today | one gateway per area, one per zone app | target mapping: Platform → `cluster-03`, Identity → `cluster-01`, Networking → `cluster-02`, Zones → `cluster-04` |
+Seven SDK resource kinds have typed descriptors. Zones own their ConfigurationStore namespace commands; IdentityHub and Rezolvr lack typed external binders, so their owning gateways carry zone declarations. Zone HTTPS certificates are requested on each zone's SecretStore. Platform ConfigurationStore starts after its local LogSpace sink; zone APIs retain console logging because remote LogSpace injection is unavailable.
 
 The rejected shape is explicit:
 
 > folder nesting never expresses ownership; the nested `Example.AppB.Gateway/Example.AppB.*` and copy-pasted `AppC` trees are removed; per-area gateways were added for Identity/Networking/Platform.
 
-A gateway owns what it references. Run `pwsh ../setup.ps1` from this directory after changing project membership, or
-`pwsh ../setup.ps1 -Check` to verify the generated solutions.
+Every executable's launch profile selects Local. Use `--no-launch-profile` with shell environment overrides. See the [root README](../README.md) for package feeds, offline rendering, the CLI, and deployed Development behavior. The full graphs still require their external command channels and operator-supplied secrets; model inspection is independent of those running services.
+
+Run `pwsh ../setup.ps1` from this directory after changing project membership, or `pwsh ../setup.ps1 -Check` to verify the generated solutions.

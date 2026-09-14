@@ -1,19 +1,46 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+
 using Assimalign.Cohesion.ApplicationModel;
+using Assimalign.Cohesion.ConfigurationStore.ApplicationModel;
+using Assimalign.Cohesion.Database.ApplicationModel;
+using Assimalign.Cohesion.SecretStore.ApplicationModel;
+using Assimalign.Cohesion.Web.ApplicationModel;
 
 IApplicationBuilder builder = Gateway.CreateBuilder(args);
 
-// AppA consumes this resource across the platform boundary, so the SDK generates
-// Externals.PlatformConfigurationStore instead of a local AddPlatformConfigurationStore verb.
-builder.RemoteReference(
+// AppA consumes this boundary as Externals.PlatformConfigurationStore.
+// Command-line and environment bindings override the standalone Local endpoint fallback.
+IConfigurationStoreResourceDescriptor config = builder.RemoteReferenceConfigurationStore(
     Externals.PlatformConfigurationStore,
     remote => remote.Endpoint("api", "https://localhost:18443"));
 builder.RemoteReference(Externals.IdentityHub, remote => { });
 
-builder.AddAppADatabase();
-builder.AddAppAApi();
-builder.AddAppASpa();
-// AppASecretStore stays referenced and generated, but its generic SDK does not yet register
-// an entry/control plane; realizing it would prevent today's Local/InProcess run from becoming ready.
-builder.UseGateway(args);
+using JsonDocument configuration = JsonDocument.Parse(File.ReadAllText(
+    Path.Combine(AppContext.BaseDirectory, "Configuration", "appa.json")));
+var seed = new Dictionary<string, string?>();
+foreach (JsonProperty section in configuration.RootElement.EnumerateObject())
+{
+    foreach (JsonProperty setting in section.Value.EnumerateObject())
+    {
+        seed.Add($"{section.Name}:{setting.Name}", setting.Value.ValueKind == JsonValueKind.String
+            ? setting.Value.GetString() : setting.Value.GetRawText());
+    }
+}
+config.AddNamespace("appa", seed);
 
+ISecretStoreResourceDescriptor secrets = builder.AddAppASecretStore()
+    .IssueCertificate("appa-api", subject: "CN=appa-api", subjectAlternativeNames: ["localhost", "127.0.0.1"]);
+// The schema-owned orders database cannot be claimed by a command; provision a separate archive.
+IDatabaseResourceDescriptor database = builder.AddAppADatabase(options => options.Storage.Size = "20Gi")
+    .AddDatabase("orders-archive", engine: "appa-sql")
+    .DependsOn(secrets);
+IWebResourceDescriptor api = builder.AddAppAApi().DependsOn(database, secrets);
+IWebResourceDescriptor spa = builder.AddAppASpa().DependsOn(api);
+
+// §4.3 assigns IdentityHub and Rezolvr commands to this consumer. Their ApplicationModel
+// packages ship no typed external binders, so their owning gateways carry those declarations.
+builder.UseGateway(args);
 await builder.Build().RunAsync();

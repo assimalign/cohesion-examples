@@ -191,7 +191,7 @@ foreach ($scaffold in $scaffolds) {
 $rootSolutionPath = Join-Path $repositoryRoot 'Assimalign.Cohesion.Examples.slnx'
 $rootSolutionXml = ConvertTo-SolutionXml `
     -Entries $rootEntries `
-    -RootFiles @('.gitignore', 'Directory.Build.props', 'Directory.Build.targets', 'global.json', 'nuget.config', 'README.md', 'setup.ps1')
+    -RootFiles @('.gitignore', 'Directory.Build.props', 'global.json', 'nuget.config', 'README.md', 'setup.ps1')
 if (Test-OrWriteGeneratedFile -Path $rootSolutionPath -Content $rootSolutionXml) {
     $generatedFilesAreStale = $true
 }

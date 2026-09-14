@@ -1,8 +1,8 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.IdentityHub">
-  <!-- The organization's identity provider: an ordinary executable whose Program.cs composes the directory, the token
-       service, the OIDC issuer and the user-flow pipelines in C#. Signing keys and TLS come from the Platform SecretStore
-       across the application boundary. Default control plane commands: identityhub.audience, identityhub.client.
-       Sdk.IdentityHub defaults: endpoint `https` (8443), readiness http:/readyz, mount `data` (Volume, 10Gi), StatefulSet. -->
+  <!-- The organization's identity provider: an ordinary executable whose Program.cs declares an operations audience
+       and a device-authorization CLI client. Signing keys and TLS come from the Platform SecretStore
+       across the application boundary. Default control plane commands: identityhub.add-audience, identityhub.add-client.
+       Sdk.IdentityHub defaults: endpoint `https` (https 8443, Certificate=tls), readiness/liveness on https, mount `tls` (Secret), mount `data` (Volume, 10Gi), StatefulSet. -->
   <PropertyGroup>
     <CohesionResourceName>identity-hub</CohesionResourceName>
     <!-- Opt-in to orchestration. Enabled: Sdk.IdentityHub generates resource.json (the manifest), Resource.g.cs (typed accessors:
@@ -13,10 +13,14 @@
   </PropertyGroup>
   <ItemGroup>
     <CohesionEndpoint Update="https" Public="true" Certificate="tls" />
-    <CohesionMount Include="tls" Kind="Secret" Source="platform-secretstore:certs/identity-hub" />
+    <CohesionMount Update="tls" Source="platform-secretstore:certs/identity-hub" />
     <CohesionMount Include="signing" Kind="Secret" Source="platform-secretstore:identity/signing-keys" />
     <CohesionSetting Include="IdentityHub:Issuer" Type="Uri" Default="https://identity.example.com" />
     <!-- Application `platform`: generated as Externals.PlatformSecretStore in the identity gateway. -->
     <CohesionResourceReference Include="..\..\Platform\Example.Platform.SecretStore\Example.Platform.SecretStore.csproj" />
+    <!-- Each confidential zone service client receives its own operator-supplied secret. -->
+    <CohesionMount Include="appa-client" Kind="Secret" Source="parameter:appa-client" />
+    <CohesionMount Include="appb-client" Kind="Secret" Source="parameter:appb-client" />
+    <CohesionMount Include="appc-client" Kind="Secret" Source="parameter:appc-client" />
   </ItemGroup>
 </Project>

@@ -5,7 +5,7 @@
     <CohesionResourceName>appa-spa</CohesionResourceName>
     <!-- Opt-in to orchestration. Enabled: Sdk.Web generates resource.json (the manifest), Resource.g.cs (typed accessors:
          Resource.Endpoints/Mounts/Settings/References over the ambient ResourceContext) and ResourceControlPlane.g.cs (the
-         Web default control plane — readiness, health, observed endpoints, stop, Web commands — owned by
+         Web default control plane — readiness, health, observed endpoints, stop; no built-in Web commands — owned by
          Web.ApplicationModel). Disabled (the default): a plain executable that no gateway can reference. -->
     <CohesionApplicationModel>enabled</CohesionApplicationModel>
   </PropertyGroup>

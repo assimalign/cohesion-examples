@@ -2,8 +2,14 @@ using Assimalign.Cohesion.Hosting;
 using Assimalign.Cohesion.IdentityHub;
 using Assimalign.Cohesion.IdentityHub.Hosting;
 
-// Owns the organization's directory, token service, OIDC issuer, and user-flow pipeline.
-// Zone audiences and clients remain declarations of the consuming zone gateways.
+// The host declares organization-owned audiences and clients.
+// Zone audiences and clients are commands in the owning Identity gateway until typed external binders exist.
 IIdentityHubApplicationBuilder builder = IdentityHubApplication.CreateBuilder(args);
+builder.AddAudience("example-operations");
+builder.AddClient("example-cli", options =>
+{
+    options.AllowDeviceAuthorization = true;
+    options.Audiences.Add("example-operations");
+});
 
 await builder.Build().RunAsync();

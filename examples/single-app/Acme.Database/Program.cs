@@ -17,7 +17,7 @@ await using SqlDatabaseEngine engine = builder.AddSqlDatabase(options =>
 
 builder.AddDatabase(engine, "customers", database =>
 {
-    database.Table<Customer>(table =>
+    database.Table<Customer>("Customers", table =>
     {
         table.Key(customer => customer.Id);
         table.Index(customer => customer.Email);

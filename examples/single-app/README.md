@@ -1,17 +1,17 @@
-# `single-app/` — one repo, one gateway, two resources
+# Single application
 
-The two-person-company story is an API and a database using the implemented Local and InProcess gateways. Select Local to
-run the resources as supervised processes, or InProcess to run both inside the gateway process. Both resources are
-ordinary executables with a `Program.cs`, and each opts in to orchestration with one csproj line so `Acme.Gateway` can
-reference it.
+Acme has two resources and one gateway. Both resources are ordinary `Program.cs` executables with explicit orchestration opt-in. The SDK supplies their build/runtime defaults and generated control planes.
 
-```bash
-dotnet run --project Acme.Gateway -- --gateway local --mode run      # two supervised processes
-dotnet run --project Acme.Gateway -- --gateway inprocess --mode run  # one process; one ResourceContext per resource
-dotnet run --project Acme.Api                                        # standalone executable
+```powershell
+dotnet run --project Acme.Gateway -- --gateway local --mode run
+dotnet run --project Acme.Gateway -- --gateway inprocess --mode run
+dotnet run --project Acme.Gateway -- --gateway docker --mode render
 ```
 
-Docker and Kubernetes remain the target scale-up path, but their gateway-provider packages are not selected by this
-`10.0.1-preview.3.local` scaffold. Once a provider is released, add it to `CohesionGateways`; adding Kubernetes also requires a
-container registry. The resources and their references do not change. Topology 0—`Acme.Api` with an embedded database and
-no gateway—is the step below this scaffold and is not materialized here.
+Local supervises two child processes; InProcess invokes both entries in one gateway process. Acme.Api deliberately keeps plain HTTP as the scale-down story. Its `/bindings` response reports the observed database endpoint and the generated Customers:PageSize default.
+
+The verified package revision builds and describes this model, but both run modes stop at database readiness: the SQL DDL executor cannot migrate the schema's principals and grants yet. The explicit Customers table name now matches its grant; the example retains the intended permissions. No successful endpoint probe was established in this pass.
+
+Docker and Kubernetes are selected provider packages at `10.0.1-preview.3`. Both renderers require published resource images in the manifests before they can produce YAML. Kubernetes rendering also requires `--cohesion-system-image <digest-pinned-image>` and `--cohesion-system-storage 1Gi`; see the [root README](../../README.md). Neither offline render needs a daemon or cluster. Kubernetes selects JIT for the gateway.
+
+Every project has a Local launch profile. Use `dotnet run --no-launch-profile` when selecting the environment through shell variables. The `cohesion` CLI can run the same gateway and report its status. Topology 0, an API with an embedded database and no gateway, is not materialized here.

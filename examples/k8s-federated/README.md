@@ -1,35 +1,26 @@
-# `k8s-federated/` — one cluster per area
+# Federated landing zone
 
-The same projects as `k8s/`, minus the root `Gateway/`: each area owns its application boundary. In the target topology,
-areas resolve one another through their gateways' control planes. Nothing is listed twice: a resource's csproj references
-the remote resource's project (or its `*.Manifest` package), and the build generates `Externals.<Name>` for the crossing.
-The pinned package set has no gateway control-plane host yet, so current Programs use static localhost development
-bindings where an endpoint is required and leave optional Identity unbound.
+These 24 projects mirror k8s without its root application-set gateway. Every resource has a `Program.cs`, explicit orchestration opt-in and the generated default control plane. Every executable's launch profile selects Local. The area gateways own their own applications.
 
-The table is the target multi-cluster placement. The checked-in `10.0.1-preview.3.local` gateway projects select Local,
-plus InProcess for composable applications; Networking remains Local because its VPN data plane is not composable. The
-currently runnable subset is each zone's Database/API/SPA chain. Kubernetes deployment and the `cohesion trust` CLI
-commands arrive with their separate provider and tooling deliverables.
+| Area | Target cluster | Application | Target peer control plane |
+| --- | --- | --- | --- |
+| Platform | cluster-03 | platform | https://platform.example.com/cohesion |
+| Identity | cluster-01 | identity | https://identity.example.com/cohesion |
+| Networking | cluster-02 | networking | https://networking.example.com/cohesion |
+| Zones | cluster-04 | appa, appb, appc | https://appa.example.com/cohesion and peers |
 
-| Area | Cluster | Application / namespace | Gateway | Control plane | Binds to |
-| --- | --- | --- | --- | --- | --- |
-| Platform | `cluster-03` | `platform` | `Example.Platform.Gateway` | `https://platform.example.com/cohesion` | — (deployed first; root of trust; holds trust grants) |
-| Identity | `cluster-01` | `identity` | `Example.Identity.Gateway` | `https://identity.example.com/cohesion` | platform |
-| Networking | `cluster-02` | `networking` | `Example.Networking.Gateway` | `https://networking.example.com/cohesion` | platform |
-| Zones | `cluster-04` | `appa`, `appb`, `appc` | `Example.AppA.Gateway`, `Example.AppB.Gateway`, `Example.AppC.Gateway` | `https://appa.example.com/cohesion`, … | identity, platform |
+These are deployment destinations, not verified live clusters. Project references crossing an application boundary generate Externals; each consumer binds them through its peer gateway. The Local endpoint fallbacks remain useful for inspecting bindings but do not replace an authorized remote command channel.
 
-In that target topology, trust is explicit and per direction: the application that must **verify** a peer registers that peer's public trust key,
-together with the **command kinds** that peer may issue against it (`--allow`); commands from a peer are otherwise refused.
-Platform verifies everyone (mount sources, intermediate-CA enrollment); Identity verifies the zones (client and token
-requests); every application verifies Platform (bootstrap material). Inter-application traffic uses the peers' public
-endpoints over TLS from the org CA.
+Zones declare ConfigurationStore namespaces through the typed external binder. IdentityHub and Rezolvr have no equivalent binder, so Identity's gateway temporarily declares zone audiences/confidential service clients and Networking's gateway declares Local loopback A records. Certificates are requested on each zone's own SecretStore. API endpoint names stay http while their scheme is HTTPS; SPAs retain HTTP. See the [k8s composition notes](../k8s/README.md) for seed ownership, certificate sources and named-secret prerequisites.
 
-```bash
-# generic area manifests can be inspected while their runtime control planes remain upstream work
+Platform ConfigurationStore is ordered after LogSpace for same-application telemetry. Zone APIs retain console logging because remote LogSpace injection is unavailable. Rezolvr, VpnGateway and LogSpace resource builders expose no domain verbs yet. The shared SecretStore content-root and SQL migration blockers prevented live readiness and telemetry verification; the [verification report](../../VERIFICATION.md) records the exact failures.
+
+```powershell
+dotnet run --project examples/k8s-federated/Zones/AppA/Example.AppA.Gateway -- --gateway local --mode describe
 dotnet run --project examples/k8s-federated/Platform/Example.Platform.Gateway -- --gateway local --mode describe
-dotnet run --project examples/k8s-federated/Networking/Example.Networking.Gateway -- --gateway local --mode describe
-
-# implemented zone subset
-dotnet run --project examples/k8s-federated/Zones/AppA/Example.AppA.Gateway -- --gateway local --mode run
-dotnet run --project examples/k8s-federated/Zones/AppA/Example.AppA.Gateway -- --gateway inprocess --mode run
+dotnet run --project examples/k8s-federated/Zones/AppA/Example.AppA.Gateway -- --gateway docker --mode render
 ```
+
+Zone gateways select both platform providers; both renderers require published resource images, and Kubernetes additionally needs a digest-pinned system image and storage size. The current manifests lack those resource images, so render stops before YAML output. Neither renderer contacts a daemon or cluster. Identity and Platform select Local/InProcess; Networking stays Local because VPN is non-composable. Use `dotnet run --no-launch-profile` with shell environment overrides. The [root README](../../README.md) covers portable feeds, deployed Development behavior and the released-feed CI publication dependency.
+
+Federation trust grants remain explicit and directional. Use the shipped `cohesion trust` CLI with the peer gateway and allowed command kinds; a model description or offline render proves neither trust nor remote mutation delivery.

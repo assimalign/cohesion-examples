@@ -48,7 +48,9 @@ jobs:
           [xml] $nugetSettings = Get-Content -Raw -LiteralPath $nugetPath
           foreach ($xpath in @(
             "/configuration/packageSources/add[@key='cohesion-local']",
-            "/configuration/packageSourceMapping/packageSource[@key='cohesion-local']"
+            "/configuration/packageSourceMapping/packageSource[@key='cohesion-local']",
+            "/configuration/packageSources/add[@key='cohesion-platforms-local']",
+            "/configuration/packageSourceMapping/packageSource[@key='cohesion-platforms-local']"
           )) {
             $node = $nugetSettings.SelectSingleNode($xpath)
             if ($null -ne $node) {
@@ -68,7 +70,8 @@ jobs:
           }
 
           if ((Get-Content -Raw -LiteralPath $globalPath) -match '\.local' -or
-              $null -ne $nugetSettings.SelectSingleNode("/configuration/packageSources/add[@key='cohesion-local']")) {
+              $null -ne $nugetSettings.SelectSingleNode("/configuration/packageSources/add[@key='cohesion-local' or @key='cohesion-platforms-local']") -or
+              $null -ne $nugetSettings.SelectSingleNode("/configuration/packageSourceMapping/packageSource[@key='cohesion-local' or @key='cohesion-platforms-local']")) {
             throw 'The CI restore must use released packages, not a developer-local feed.'
           }
 

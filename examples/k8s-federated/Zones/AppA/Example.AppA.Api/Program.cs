@@ -10,7 +10,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 await using WebApplication application = builder.Build();
 
 Uri database = Resource.References.AppADatabase.Db.Url;
-Uri configuration = Resource.References.PlatformConfigurationstore.Api.Url;
+Uri configuration = Resource.References.PlatformConfigurationStore.Api.Url;
 int pageSize = Resource.Settings.OrdersPageSize.Get<int>();
 
 application.Use(async (context, next) =>
