@@ -6,7 +6,7 @@ using Assimalign.Cohesion.ConfigurationStore.Hosting;
 using Assimalign.Cohesion.Hosting;
 using Assimalign.Cohesion.Hosting.Resources;
 
-IConfigurationStoreApplicationBuilder builder = ConfigurationStoreApplication.CreateBuilder(args);
+ConfigurationStoreApplicationBuilder builder = ConfigurationStoreApplication.CreateBuilder(args);
 using JsonDocument configuration = JsonDocument.Parse(File.ReadAllText(
     Path.Combine(ResourceRuntime.Current.ContentRootPath, "Configuration", "networking.json")));
 // The shared namespace is a gateway-owned command. Claiming it here too would reject that command.
@@ -28,4 +28,5 @@ builder.AddNamespace("networking", ns =>
     }
 });
 
-await builder.Build().RunAsync();
+await using ConfigurationStoreApplication application = builder.Build();
+await application.RunAsync();
