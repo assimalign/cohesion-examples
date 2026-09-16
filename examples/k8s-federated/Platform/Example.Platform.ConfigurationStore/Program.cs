@@ -3,7 +3,6 @@ using System.Text.Json;
 
 using Assimalign.Cohesion.ConfigurationStore;
 using Assimalign.Cohesion.ConfigurationStore.Hosting;
-using Assimalign.Cohesion.Hosting;
 using Assimalign.Cohesion.Hosting.Resources;
 
 ConfigurationStoreApplicationBuilder builder = ConfigurationStoreApplication.CreateBuilder(args);
