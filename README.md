@@ -4,11 +4,11 @@ Three consumer scaffolds implement [the Cohesion developer-experience design](ht
 
 | Scaffold | Projects | Composition |
 | --- | ---: | --- |
-| [single-app](examples/single-app/) | 3 | Acme API + database, one gateway |
-| [k8s](examples/k8s/) | 25 | Platform, Identity, Networking and three zones, plus a root application set |
-| [k8s-federated](examples/k8s-federated/) | 24 | The same six applications with independent gateways |
+| [single-app](examples/ApplicationModel/single-app/) | 3 | Acme API + database, one gateway |
+| [k8s](examples/ApplicationModel/k8s/) | 25 | Platform, Identity, Networking and three zones, plus a root application set |
+| [k8s-federated](examples/ApplicationModel/k8s-federated/) | 24 | The same six applications with independent gateways |
 
-The SDK supplies executable defaults and Debug runtime settings. Root `Directory.Build.props` carries organization identity; each area sets `CohesionApplication` once. Every resource explicitly enables `CohesionApplicationModel`; gateways are always enabled by `Sdk.Gateway`. Resources have generated manifests, `Resource.*` accessors and their area's default control plane. There are no hand-written resource/gateway wrapper classes or SDK bridges.
+The SDK supplies executable defaults and, in every configuration, the self-contained host-runtime posture; project files carry no runtime properties. Root `Directory.Build.props` carries organization identity; each area sets `CohesionApplication` once. Every resource explicitly enables `CohesionApplicationModel`; gateways are always enabled by `Sdk.Gateway`. Resources have generated manifests, `Resource.*` accessors and their area's default control plane. There are no hand-written resource/gateway wrapper classes or SDK bridges.
 
 Gateway generation returns typed descriptors for Web, Database, ConfigurationStore, SecretStore, IdentityHub, Rezolvr and LogSpace. The five command-bearing areas used here have declarative verbs; Web and LogSpace have none. VpnGateway and Scheduler still use the generic descriptor. Only Web, Database and ConfigurationStore have typed external binders: zones declare configuration namespaces themselves, while Identity and Networking gateways temporarily carry the zone audience/client and DNS commands.
 
@@ -25,40 +25,40 @@ Every project has `Properties/launchSettings.json` selecting environment `Local`
 `cohesion run` injects `--environment Local` only when no explicit argument or shell environment is supplied and the effective gateway is absent, `local` or `inprocess`. The CLI suppresses launch profiles when `COHESION_ENVIRONMENT` or `DOTNET_ENVIRONMENT` is supplied in the shell; a direct `dotnet run` requires `--no-launch-profile` explicitly.
 
 ```powershell
-dotnet run --project examples/k8s/Zones/AppA/Example.AppA.Gateway -- --mode describe
-dotnet run --project examples/k8s/Gateway/Example.Gateway -- --mode describe
-dotnet run --project examples/single-app/Acme.Gateway -- --gateway local --mode run
-dotnet run --project examples/single-app/Acme.Gateway -- --gateway inprocess --mode run
+dotnet run --project examples/ApplicationModel/k8s/Zones/AppA/Example.AppA.Gateway -- --mode describe
+dotnet run --project examples/ApplicationModel/k8s/Gateway/Example.Gateway -- --mode describe
+dotnet run --project examples/ApplicationModel/single-app/Acme.Gateway -- --gateway local --mode run
+dotnet run --project examples/ApplicationModel/single-app/Acme.Gateway -- --gateway inprocess --mode run
 ```
 
-The full zone declares four local resources: SecretStore, Database, API and SPA. Zone APIs declare HTTPS using their SecretStore's requested certificate; Acme and the SPAs retain HTTP. External ConfigurationStore commands require a reachable, authorized Platform gateway; a static localhost endpoint fallback supplies bindings but cannot substitute for that command channel. See the [landing-zone notes](examples/k8s/README.md) for runtime prerequisites and remaining gaps.
+The full zone declares four local resources: SecretStore, Database, API and SPA. Zone APIs declare HTTPS using their SecretStore's requested certificate; Acme and the SPAs retain HTTP. External ConfigurationStore commands require a reachable, authorized Platform gateway; a static localhost endpoint fallback supplies bindings but cannot substitute for that command channel. See the [landing-zone notes](examples/ApplicationModel/k8s/README.md) for runtime prerequisites and remaining gaps.
 
-The final verification against Cohesion `5dfa1e3c` builds all 52 projects and describes the individual and root application models. Live runs remain blocked by SecretStore's ambient content-root mismatch and SQL's unsupported principal/grant migrations. No healthy HTTPS probe or delivered telemetry record was established. The full evidence and remaining SDK issues are in [VERIFICATION.md](VERIFICATION.md).
+The latest verification, against Cohesion `a8c0e22e` on `dev/dx-design-buildout` (local `10.0.0-preview.1.local` packs whose SDK targets match that commit), builds all 52 projects and describes the AppA zone gateway, the root application set, the federated Platform gateway and Acme. Live runs were not re-verified in that pass. The earlier report in [VERIFICATION.md](VERIFICATION.md), against Cohesion `5dfa1e3c`, recorded SecretStore's ambient content-root mismatch, SQL's principal/grant migration gap and the remaining SDK issues; no healthy HTTPS probe or delivered telemetry record has been established since.
 
 ## Packages and portable sources
 
-`global.json` pins all 20 Cohesion SDKs to `10.0.1-preview.3.local`. The checked-in `nuget.config` retains the verification machine's two local feeds:
+`global.json` pins all 20 Cohesion SDKs to `10.0.0-preview.1.local`. The checked-in `nuget.config` maps the two sibling checkouts' local feeds (the companion-repository layout: `cohesion-examples` beside `cohesion` and `cohesion-platforms`):
 
-- `C:\Source\repos\assimalign\cohesion\_out\packages`
-- `C:\Source\repos\assimalign\cohesion-platforms\_out\packages`
+- `..\cohesion\_out\packages`
+- `..\cohesion-platforms\_out\packages`
 
-The three exact platform mappings are `Assimalign.Cohesion.ApplicationModel.Gateway.Containers`, `.Docker`, and `.Kubernetes`; they resolve from the platforms feed at `10.0.1-preview.3`. The seven gateways selecting these providers pin `CohesionPlatformsVersion` themselves so root props remain identity-only. InProcess and ControlPlane continue to resolve from the Cohesion feed.
+The three exact platform mappings are `Assimalign.Cohesion.ApplicationModel.Gateway.Containers`, `.Docker`, and `.Kubernetes`; they resolve from the platforms feed at `10.0.0-preview.1`. The seven gateways selecting these providers pin `CohesionPlatformsVersion` themselves so root props remain identity-only. InProcess and ControlPlane continue to resolve from the Cohesion feed.
 
 For another machine, copy `nuget.config` to ignored `nuget.config.user` and update the two source paths with `dotnet nuget update source <name> --source <path> --configfile nuget.config.user`. Use `dotnet restore --configfile nuget.config.user`, then build with `--no-restore`. A developer may also use `dotnet nuget add source` in their user configuration; this repository's `<clear />` means such a source must also be listed in the selected config. Keep credentials outside tracked files. During SDK resolution, make the developer config the active repository config locally, without committing its path changes. Use a fresh `NUGET_PACKAGES` when the same `.local` version is repacked.
 
-CI removes **both** local sources and mappings, switches SDK pins to `10.0.1-preview.3`, and rejects leftover local source entries. `.github/workflows/build.yml` is structurally complete and blocked on the nuget.org promotion of `10.0.1-preview.3`. The credential guard and ignored `.cohesion/` and `parameters.json` remain in place.
+CI removes **both** local sources and mappings, switches SDK pins to `10.0.0-preview.1`, and rejects leftover local source entries. `.github/workflows/build.yml` is structurally complete and blocked on the nuget.org promotion of `10.0.0-preview.1`. The credential guard and ignored `.cohesion/` and `parameters.json` remain in place.
 
 ## Offline platform rendering and CLI
 
 Docker and Kubernetes providers are selected by the zone gateways and Acme. Networking stays Local because VpnGateway is non-composable; the root set also stays Local to demonstrate application-set model resolution. Identity and Platform retain Local/InProcess.
 
 ```powershell
-dotnet run --project examples/k8s/Zones/AppA/Example.AppA.Gateway -- --gateway docker --mode render
+dotnet run --project examples/ApplicationModel/k8s/Zones/AppA/Example.AppA.Gateway -- --gateway docker --mode render
 # Illustrative digest for OFFLINE rendering only; replace it with a real published digest before deployment.
 $image = 'example/gateway@sha256:' + ('0' * 64)
-dotnet run --project examples/k8s/Zones/AppA/Example.AppA.Gateway -- --gateway kubernetes --mode render --environment Development --cohesion-system-image $image --cohesion-system-storage 1Gi --control-plane-expose loadbalancer
+dotnet run --project examples/ApplicationModel/k8s/Zones/AppA/Example.AppA.Gateway -- --gateway kubernetes --mode render --environment Development --cohesion-system-image $image --cohesion-system-storage 1Gi --control-plane-expose loadbalancer
 
-dotnet tool install Assimalign.Cohesion.Cli --tool-path .cohesion/tools --version 10.0.1-preview.3.local --configfile nuget.config
+dotnet tool install Assimalign.Cohesion.Cli --tool-path .cohesion/tools --version 10.0.0-preview.1.local --configfile nuget.config
 # Run cohesion status from a gateway project directory; cohesion new --help lists template usage.
 ```
 

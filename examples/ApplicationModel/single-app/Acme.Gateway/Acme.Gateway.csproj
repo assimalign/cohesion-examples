@@ -4,7 +4,7 @@
     <!-- A gateway is always enabled by Sdk.Gateway. -->
     <CohesionGateways>Local;InProcess;Docker;Kubernetes</CohesionGateways>
     <!-- Platforms ship without the Cohesion SDK feed's .local suffix. -->
-    <CohesionPlatformsVersion>10.0.1-preview.3</CohesionPlatformsVersion>
+    <CohesionPlatformsVersion>10.0.0-preview.1</CohesionPlatformsVersion>
     <CohesionGatewayInProcess>true</CohesionGatewayInProcess>
   </PropertyGroup>
   <ItemGroup>

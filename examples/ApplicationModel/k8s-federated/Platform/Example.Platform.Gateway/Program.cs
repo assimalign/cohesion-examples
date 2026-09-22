@@ -4,8 +4,6 @@ using System.IO;
 using System.Text.Json;
 
 using Assimalign.Cohesion.ApplicationModel;
-using Assimalign.Cohesion.ConfigurationStore.ApplicationModel;
-using Assimalign.Cohesion.SecretStore.ApplicationModel;
 
 IApplicationBuilder builder = Gateway.CreateBuilder(args);
 ISecretStoreResourceDescriptor secrets = builder.AddPlatformSecretStore()

@@ -147,20 +147,20 @@ function Test-OrWriteGeneratedFile {
 $scaffolds = @(
     [pscustomobject]@{
         Name = 'single-app'
-        Root = Join-Path $repositoryRoot 'examples/single-app'
-        Solution = Join-Path $repositoryRoot 'examples/single-app/Acme.slnx'
+        Root = Join-Path $repositoryRoot 'examples/ApplicationModel/single-app'
+        Solution = Join-Path $repositoryRoot 'examples/ApplicationModel/single-app/Acme.slnx'
         Order = 0
     },
     [pscustomobject]@{
         Name = 'k8s'
-        Root = Join-Path $repositoryRoot 'examples/k8s'
-        Solution = Join-Path $repositoryRoot 'examples/k8s/Example.K8s.slnx'
+        Root = Join-Path $repositoryRoot 'examples/ApplicationModel/k8s'
+        Solution = Join-Path $repositoryRoot 'examples/ApplicationModel/k8s/Example.K8s.slnx'
         Order = 1
     },
     [pscustomobject]@{
         Name = 'k8s-federated'
-        Root = Join-Path $repositoryRoot 'examples/k8s-federated'
-        Solution = Join-Path $repositoryRoot 'examples/k8s-federated/Example.Federated.slnx'
+        Root = Join-Path $repositoryRoot 'examples/ApplicationModel/k8s-federated'
+        Solution = Join-Path $repositoryRoot 'examples/ApplicationModel/k8s-federated/Example.Federated.slnx'
         Order = 2
     }
 )

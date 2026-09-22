@@ -4,10 +4,6 @@ using System.IO;
 using System.Text.Json;
 
 using Assimalign.Cohesion.ApplicationModel;
-using Assimalign.Cohesion.ConfigurationStore.ApplicationModel;
-using Assimalign.Cohesion.Database.ApplicationModel;
-using Assimalign.Cohesion.SecretStore.ApplicationModel;
-using Assimalign.Cohesion.Web.ApplicationModel;
 
 IApplicationBuilder builder = Gateway.CreateBuilder(args);
 

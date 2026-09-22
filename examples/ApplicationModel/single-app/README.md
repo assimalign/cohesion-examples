@@ -12,6 +12,6 @@ Local supervises two child processes; InProcess invokes both entries in one gate
 
 The verified package revision builds and describes this model, but both run modes stop at database readiness: the SQL DDL executor cannot migrate the schema's principals and grants yet. The explicit Customers table name now matches its grant; the example retains the intended permissions. No successful endpoint probe was established in this pass.
 
-Docker and Kubernetes are selected provider packages at `10.0.1-preview.3`. Both renderers require published resource images in the manifests before they can produce YAML. Kubernetes rendering also requires `--cohesion-system-image <digest-pinned-image>` and `--cohesion-system-storage 1Gi`; see the [root README](../../README.md). Neither offline render needs a daemon or cluster. Kubernetes selects JIT for the gateway.
+Docker and Kubernetes are selected provider packages at `10.0.0-preview.1`. Both renderers require published resource images in the manifests before they can produce YAML. Kubernetes rendering also requires `--cohesion-system-image <digest-pinned-image>` and `--cohesion-system-storage 1Gi`; see the [root README](../../README.md). Neither offline render needs a daemon or cluster. Kubernetes selects JIT for the gateway.
 
 Every project has a Local launch profile. Use `dotnet run --no-launch-profile` when selecting the environment through shell variables. The `cohesion` CLI can run the same gateway and report its status. Topology 0, an API with an embedded database and no gateway, is not materialized here.

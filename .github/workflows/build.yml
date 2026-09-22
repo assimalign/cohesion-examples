@@ -31,7 +31,7 @@ jobs:
       - name: Select the release-feed Cohesion pins
         shell: pwsh
         run: |
-          $releaseVersion = '10.0.1-preview.3'
+          $releaseVersion = '10.0.0-preview.1'
 
           $globalPath = Join-Path $env:GITHUB_WORKSPACE 'global.json'
           $globalSettings = Get-Content -Raw -LiteralPath $globalPath | ConvertFrom-Json

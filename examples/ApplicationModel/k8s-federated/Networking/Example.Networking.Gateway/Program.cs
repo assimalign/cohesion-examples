@@ -1,7 +1,6 @@
 using System.Net;
 
 using Assimalign.Cohesion.ApplicationModel;
-using Assimalign.Cohesion.Rezolvr.ApplicationModel;
 
 IApplicationBuilder builder = Gateway.CreateBuilder(args);
 builder.RemoteReference(

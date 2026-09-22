@@ -1,22 +1,25 @@
 using System;
 
-using Assimalign.Cohesion.Database;
 using Assimalign.Cohesion.Database.Hosting;
 using Assimalign.Cohesion.Database.Sql;
+using Assimalign.Cohesion.Database.Sql.Schema;
+using Assimalign.Cohesion.Hosting;
 using Assimalign.Cohesion.Database.Storage;
 using Example.AppA.Database;
 
 DatabaseApplicationBuilder builder = DatabaseApplication.CreateBuilder(args);
 
-await using SqlDatabaseEngine engine = builder.AddSqlDatabase(options =>
+builder.AddSql((_, options) =>
 {
     options.EngineName = "appa-sql";
     options.RootPath = Resource.Mounts.Data.Path
         ?? throw new InvalidOperationException("The database data mount must have a materialized path.");
     options.Durability = Resource.Settings.DatabaseDurability.Get<StorageCommitDurability>();
+    options.AddServer(engine => SqlDatabaseServer.Create(
+        (SqlDatabaseEngine)engine, new SqlDatabaseServerOptions().Listen(Resource.Endpoints.Db)));
 });
 
-builder.AddDatabase(engine, "orders", database =>
+SqlCompiledSchema schema = SqlSchema.Compile("orders", database =>
 {
     database.Table<Order>("Orders", table =>
     {
@@ -30,10 +33,10 @@ builder.AddDatabase(engine, "orders", database =>
     });
     database.Principal(
         "appa-api",
-        principal => principal.Grant(Permission.ReadWrite, "Orders", "OrderLines"));
+        principal => principal.Grant(SqlPermission.ReadWrite, "Orders", "OrderLines"));
 });
 
-builder.AddSqlServer(engine, options => options.Listen(Resource.Endpoints.Db));
+builder.AddDatabase("appa-sql", "orders", schema);
 
 await using DatabaseApplication application = builder.Build();
 await application.RunAsync();

@@ -1,5 +1,4 @@
 using Assimalign.Cohesion.ApplicationModel;
-using Assimalign.Cohesion.IdentityHub.ApplicationModel;
 
 IApplicationBuilder builder = Gateway.CreateBuilder(args);
 builder.RemoteReference(

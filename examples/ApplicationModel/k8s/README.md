@@ -39,10 +39,10 @@ Platform orders `LogSpace.DependsOn(secrets)` and `ConfigurationStore.DependsOn(
 SDK TLS mounts on IdentityHub and ConfigurationStore are updated, never duplicated. LogSpace defaults to HTTPS otlp:4318 and query:8443. Rezolvr declares separate dns/UDP and dns-tcp/TCP endpoints and has no data mount. VpnGateway exposes only the SDK's HTTP control plane; its old wireguard Update was a no-op and was removed. Rezolvr, VpnGateway and LogSpace builders currently have no domain-composition verbs.
 
 ```powershell
-dotnet run --project examples/k8s/Zones/AppA/Example.AppA.Gateway -- --mode describe
-dotnet run --project examples/k8s/Zones/AppA/Example.AppA.Gateway -- --gateway local --mode run
-dotnet run --project examples/k8s/Zones/AppA/Example.AppA.Gateway -- --gateway inprocess --mode run
-dotnet run --project examples/k8s/Gateway/Example.Gateway -- --mode describe
+dotnet run --project examples/ApplicationModel/k8s/Zones/AppA/Example.AppA.Gateway -- --mode describe
+dotnet run --project examples/ApplicationModel/k8s/Zones/AppA/Example.AppA.Gateway -- --gateway local --mode run
+dotnet run --project examples/ApplicationModel/k8s/Zones/AppA/Example.AppA.Gateway -- --gateway inprocess --mode run
+dotnet run --project examples/ApplicationModel/k8s/Gateway/Example.Gateway -- --mode describe
 ```
 
 Zone gateways select Local, InProcess, Docker and Kubernetes. Networking remains Local because VPN is non-composable. See the [root README](../../README.md) for exact offline rendering arguments, package setup, CLI usage and the shell-environment `--no-launch-profile` requirement. Both render attempts currently reject the missing resource `artifact.image`; published Linux images are a prerequisite, even for offline rendering.

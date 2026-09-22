@@ -16,9 +16,9 @@ Zones declare ConfigurationStore namespaces through the typed external binder. I
 Platform ConfigurationStore is ordered after LogSpace for same-application telemetry. Zone APIs retain console logging because remote LogSpace injection is unavailable. Rezolvr, VpnGateway and LogSpace resource builders expose no domain verbs yet. The shared SecretStore content-root and SQL migration blockers prevented live readiness and telemetry verification; the [verification report](../../VERIFICATION.md) records the exact failures.
 
 ```powershell
-dotnet run --project examples/k8s-federated/Zones/AppA/Example.AppA.Gateway -- --gateway local --mode describe
-dotnet run --project examples/k8s-federated/Platform/Example.Platform.Gateway -- --gateway local --mode describe
-dotnet run --project examples/k8s-federated/Zones/AppA/Example.AppA.Gateway -- --gateway docker --mode render
+dotnet run --project examples/ApplicationModel/k8s-federated/Zones/AppA/Example.AppA.Gateway -- --gateway local --mode describe
+dotnet run --project examples/ApplicationModel/k8s-federated/Platform/Example.Platform.Gateway -- --gateway local --mode describe
+dotnet run --project examples/ApplicationModel/k8s-federated/Zones/AppA/Example.AppA.Gateway -- --gateway docker --mode render
 ```
 
 Zone gateways select both platform providers; both renderers require published resource images, and Kubernetes additionally needs a digest-pinned system image and storage size. The current manifests lack those resource images, so render stops before YAML output. Neither renderer contacts a daemon or cluster. Identity and Platform select Local/InProcess; Networking stays Local because VPN is non-composable. Use `dotnet run --no-launch-profile` with shell environment overrides. The [root README](../../README.md) covers portable feeds, deployed Development behavior and the released-feed CI publication dependency.
