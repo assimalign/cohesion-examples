@@ -1,7 +1,8 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.ConfigurationStore">
   <!-- The platform configuration resource is an ordinary executable whose Program.cs seeds the networking
-       namespace; its gateway seeds shared. Consumers reach it through the gateway's mount resolution
-       (`platform-configuration-store:<key>`) or the ConfigurationStore.Client at run time. Zone namespaces are not declared
+       namespace; its gateway seeds shared. Platform resources reach it through the gateway's mount resolution
+       (`platform-configuration-store:<key>`, registered by the Platform gateway's UseConfigurationStore), and other
+       applications through the ConfigurationStore.Client at run time. Zone namespaces are not declared
        here: each zone claims its own with a `config.AddNamespace(...)` command from its gateway.
        Default control plane commands: configurationstore.add-namespace, configurationstore.set-value, configurationstore.remove-value.
        Sdk.ConfigurationStore defaults: endpoint `api` (https 8443, private, Certificate=tls), mount `tls` (Secret), mount `data` (Volume, 10Gi), StatefulSet, replicas 1. -->

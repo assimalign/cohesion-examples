@@ -1,5 +1,0 @@
-﻿<Project Sdk="Assimalign.Cohesion.Sdk.Database">
-  <ItemGroup>
-    <Folder Include="Definitions\" />
-  </ItemGroup>
-</Project>

@@ -8,7 +8,7 @@ All three scaffolds use packaged Cohesion SDKs, executable `Program.cs` composit
 | [k8s](k8s/) | 25 | Six applications and one Local root application set |
 | [k8s-federated](k8s-federated/) | 24 | The same applications, each independently owned |
 
-Seven SDK resource kinds have typed descriptors. Zones own their ConfigurationStore namespace commands; IdentityHub and Rezolvr lack typed external binders, so their owning gateways carry zone declarations. Zone HTTPS certificates are requested on each zone's SecretStore. Platform ConfigurationStore starts after its local LogSpace sink; zone APIs retain console logging because remote LogSpace injection is unavailable.
+Gateways compose each resource with its area's hand-written verb over the generated manifest and register their store, certificate-authority, trust and telemetry providers explicitly. Zones own their ConfigurationStore namespace commands; IdentityHub and Rezolvr lack typed external binders, so their owning gateways carry zone declarations. Zone HTTPS certificates are requested on each zone's SecretStore. Platform ConfigurationStore starts after its local LogSpace sink; zone APIs retain console logging because a gateway mints telemetry credentials only for a sink in its own application, and these examples do not point zones at the Platform LogSpace through `ResourceTelemetrySink.External` with an operator-supplied headers parameter.
 
 The rejected shape is explicit:
 

@@ -6,13 +6,23 @@ using System.Text.Json;
 using Assimalign.Cohesion.ApplicationModel;
 
 IApplicationBuilder builder = Gateway.CreateBuilder(args);
-ISecretStoreResourceDescriptor secrets = builder.AddPlatformSecretStore()
+ISecretStoreResourceDescriptor secrets = builder.AddSecretStore(Manifests.PlatformSecretStore)
     .IssueCertificate("platform-configuration-store", "CN=platform-configuration-store",
         subjectAlternativeNames: ["localhost", "127.0.0.1"]);
+// Providers are explicit. The SecretStore resolves platform-secretstore:<key> mounts (the
+// ConfigurationStore's TLS leaf), issues the leaves of endpoints whose certificate mount has no
+// source (LogSpace's), and persists peer trust grants.
+builder.UseSecretStore(secrets)
+    .AsCertificateAuthority()
+    .AsTrustStore();
 // LogSpace's DependsOn returns the base descriptor. ConfigurationStore starts after the sink;
 // SecretStore bootstraps it first and therefore retains console logging.
-IApplicationResourceDescriptor logs = builder.AddPlatformLogSpace().DependsOn(secrets);
-IConfigurationStoreResourceDescriptor config = builder.AddPlatformConfigurationStore().DependsOn(secrets, logs);
+IApplicationResourceDescriptor logs = builder.AddLogSpace(Manifests.PlatformLogSpace).DependsOn(secrets);
+builder.Providers.Telemetry = ResourceTelemetrySink.FromResource(logs);
+IConfigurationStoreResourceDescriptor config = builder.AddConfigurationStore(Manifests.PlatformConfigurationStore)
+    .DependsOn(secrets, logs);
+// Resolves platform-configuration-store:<namespace> Configuration mounts of platform resources.
+builder.UseConfigurationStore(config);
 
 using JsonDocument configuration = JsonDocument.Parse(File.ReadAllText(
     Path.Combine(AppContext.BaseDirectory, "Configuration", "shared.json")));

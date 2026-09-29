@@ -27,14 +27,22 @@ foreach (JsonProperty section in configuration.RootElement.EnumerateObject())
 }
 config.AddNamespace("appb", seed);
 
-ISecretStoreResourceDescriptor secrets = builder.AddAppBSecretStore()
+ISecretStoreResourceDescriptor secrets = builder.AddSecretStore(Manifests.AppBSecretStore)
     .IssueCertificate("appb-api", subject: "CN=appb-api", subjectAlternativeNames: ["localhost", "127.0.0.1"]);
+// Providers are explicit. The zone SecretStore resolves appb-secretstore:<key> mounts (the API's
+// TLS leaf), issues the leaves of endpoints whose certificate mount has no source, and persists
+// peer trust grants. The platform ConfigurationStore stays a remote reference, never a source.
+builder.UseSecretStore(secrets)
+    .AsCertificateAuthority()
+    .AsTrustStore();
 // The schema-owned billing database cannot be claimed by a command; provision a separate archive.
-IDatabaseResourceDescriptor database = builder.AddAppBDatabase(options => options.Storage.Size = "20Gi")
+IDatabaseResourceDescriptor database = builder.AddDatabase(
+        Manifests.AppBDatabase,
+        new DatabaseResourceOptions { Storage = { Size = "20Gi" } })
     .AddDatabase("billing-archive", engine: "appb-sql")
     .DependsOn(secrets);
-IWebResourceDescriptor api = builder.AddAppBApi().DependsOn(database, secrets);
-IWebResourceDescriptor spa = builder.AddAppBSpa().DependsOn(api);
+IWebResourceDescriptor api = builder.AddWeb(Manifests.AppBApi).DependsOn(database, secrets);
+IWebResourceDescriptor spa = builder.AddWeb(Manifests.AppBSpa).DependsOn(api);
 
 // §4.3 assigns IdentityHub and Rezolvr commands to this consumer. Their ApplicationModel
 // packages ship no typed external binders, so their owning gateways carry those declarations.

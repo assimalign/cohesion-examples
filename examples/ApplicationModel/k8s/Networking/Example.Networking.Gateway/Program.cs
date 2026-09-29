@@ -9,8 +9,10 @@ builder.RemoteReference(
 builder.RemoteReference(
     Externals.PlatformConfigurationStore,
     remote => remote.Endpoint("api", "https://localhost:18443"));
-IRezolvrResourceDescriptor dns = builder.AddNetworkingRezolvr();
-IApplicationResourceDescriptor vpn = builder.AddNetworkingVpnGateway();
+// Networking owns no store: the VPN keys are a parameter: mount (cross-application store sources
+// are not supported yet), so no provider is registered.
+IRezolvrResourceDescriptor dns = builder.AddRezolvr(Manifests.NetworkingRezolvr);
+IVpnGatewayResourceDescriptor vpn = builder.AddVpnGateway(Manifests.NetworkingVpnGateway);
 
 // §4.3 assigns this declaration to the consuming application; Rezolvr.ApplicationModel
 // ships no RemoteReferenceRezolvr binder, so it is declared by the owning gateway until that gap closes.

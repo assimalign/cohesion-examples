@@ -9,6 +9,11 @@
     <CohesionResourceReference Include="..\Example.Platform.SecretStore\Example.Platform.SecretStore.csproj" />
     <CohesionResourceReference Include="..\Example.Platform.ConfigurationStore\Example.Platform.ConfigurationStore.csproj" />
     <CohesionResourceReference Include="..\Example.Platform.LogSpace\Example.Platform.LogSpace.csproj" />
+    <!-- Opt-in gateway providers, registered in Program.cs: builder.UseSecretStore(secrets).AsCertificateAuthority().AsTrustStore()
+         and builder.UseConfigurationStore(config). Sdk.Gateway injects no provider package; the telemetry sink is assigned
+         on builder.Providers.Telemetry and needs no package. -->
+    <CohesionPackageReference Include="Assimalign.Cohesion.SecretStore.ApplicationModel.Orchestration" Version="$(CohesionVersion)" />
+    <CohesionPackageReference Include="Assimalign.Cohesion.ConfigurationStore.ApplicationModel.Orchestration" Version="$(CohesionVersion)" />
     <Content Include="..\Example.Platform.ConfigurationStore\Configuration\shared.json" Link="Configuration\shared.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

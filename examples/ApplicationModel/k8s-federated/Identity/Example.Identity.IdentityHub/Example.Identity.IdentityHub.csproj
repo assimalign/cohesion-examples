@@ -1,7 +1,7 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.IdentityHub">
   <!-- The organization's identity provider: an ordinary executable whose Program.cs declares an operations audience
-       and a device-authorization CLI client. Signing keys and TLS come from the Platform SecretStore
-       across the application boundary. Default control plane commands: identityhub.add-audience, identityhub.add-client.
+       and a device-authorization CLI client. Signing keys and TLS are operator-supplied parameters until cross-application
+       store sources are supported. Default control plane commands: identityhub.add-audience, identityhub.add-client.
        Sdk.IdentityHub defaults: endpoint `https` (https 8443, Certificate=tls), readiness/liveness on https, mount `tls` (Secret), mount `data` (Volume, 10Gi), StatefulSet. -->
   <PropertyGroup>
     <CohesionResourceName>identity-hub</CohesionResourceName>
@@ -13,8 +13,12 @@
   </PropertyGroup>
   <ItemGroup>
     <CohesionEndpoint Update="https" Public="true" Certificate="tls" />
-    <CohesionMount Update="tls" Source="platform-secretstore:certs/identity-hub" />
-    <CohesionMount Include="signing" Kind="Secret" Source="platform-secretstore:identity/signing-keys" />
+    <!-- Follow-up: these were platform-secretstore:certs/identity-hub and platform-secretstore:identity/signing-keys.
+         Cross-application store sources are not supported yet (the gateway's Build() rejects a mount source that names
+         another application's resource), so the TLS bundle and signing keys are parameters until the store resources
+         mature; restore the platform-secretstore sources then. -->
+    <CohesionMount Update="tls" Source="parameter:identity-hub-tls" />
+    <CohesionMount Include="signing" Kind="Secret" Source="parameter:identity-signing-keys" />
     <CohesionSetting Include="IdentityHub:Issuer" Type="Uri" Default="https://identity.example.com" />
     <!-- Application `platform`: generated as Externals.PlatformSecretStore in the identity gateway. -->
     <CohesionResourceReference Include="..\..\Platform\Example.Platform.SecretStore\Example.Platform.SecretStore.csproj" />

@@ -27,14 +27,22 @@ foreach (JsonProperty section in configuration.RootElement.EnumerateObject())
 }
 config.AddNamespace("appc", seed);
 
-ISecretStoreResourceDescriptor secrets = builder.AddAppCSecretStore()
+ISecretStoreResourceDescriptor secrets = builder.AddSecretStore(Manifests.AppCSecretStore)
     .IssueCertificate("appc-api", subject: "CN=appc-api", subjectAlternativeNames: ["localhost", "127.0.0.1"]);
+// Providers are explicit. The zone SecretStore resolves appc-secretstore:<key> mounts (the API's
+// TLS leaf), issues the leaves of endpoints whose certificate mount has no source, and persists
+// peer trust grants. The platform ConfigurationStore stays a remote reference, never a source.
+builder.UseSecretStore(secrets)
+    .AsCertificateAuthority()
+    .AsTrustStore();
 // The schema-owned inventory database cannot be claimed by a command; provision a separate archive.
-IDatabaseResourceDescriptor database = builder.AddAppCDatabase(options => options.Storage.Size = "20Gi")
+IDatabaseResourceDescriptor database = builder.AddDatabase(
+        Manifests.AppCDatabase,
+        new DatabaseResourceOptions { Storage = { Size = "20Gi" } })
     .AddDatabase("inventory-archive", engine: "appc-sql")
     .DependsOn(secrets);
-IWebResourceDescriptor api = builder.AddAppCApi().DependsOn(database, secrets);
-IWebResourceDescriptor spa = builder.AddAppCSpa().DependsOn(api);
+IWebResourceDescriptor api = builder.AddWeb(Manifests.AppCApi).DependsOn(database, secrets);
+IWebResourceDescriptor spa = builder.AddWeb(Manifests.AppCSpa).DependsOn(api);
 
 // §4.3 assigns IdentityHub and Rezolvr commands to this consumer. Their ApplicationModel
 // packages ship no typed external binders, so their owning gateways carry those declarations.

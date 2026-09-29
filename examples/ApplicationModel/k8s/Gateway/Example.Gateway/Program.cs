@@ -20,12 +20,31 @@ string[] applicationSetArgs = hasEnvironmentArgument || hasEnvironmentVariable
 var gatewayOptions = new LocalGatewayOptions();
 ApplicationGatewayCommandLine.Apply(gatewayOptions, applicationSetArgs);
 
+// A member's model arrives from its gateway's describe output without provider registrations:
+// providers are code. Each member registers its own, by resource name, and never inherits another
+// member's. Identity and Networking own no store and read only parameter: mounts.
 IApplicationSet set = Application.CreateSet(new LocalGateway(gatewayOptions), applicationSetArgs)
-    .AddApplication(Applications.Platform)
+    .AddApplication(Applications.Platform, platform =>
+    {
+        platform.UseSecretStore("platform-secretstore")
+            .AsCertificateAuthority()
+            .AsTrustStore();
+        platform.UseConfigurationStore("platform-configuration-store");
+        platform.Providers.Telemetry = ResourceTelemetrySink.FromResource("platform-logspace");
+    })
     .AddApplication(Applications.Identity)
     .AddApplication(Applications.Networking)
-    .AddApplication(Applications.AppA)
-    .AddApplication(Applications.AppB)
-    .AddApplication(Applications.AppC);
+    .AddApplication(Applications.AppA, appa => appa
+        .UseSecretStore("appa-secretstore")
+        .AsCertificateAuthority()
+        .AsTrustStore())
+    .AddApplication(Applications.AppB, appb => appb
+        .UseSecretStore("appb-secretstore")
+        .AsCertificateAuthority()
+        .AsTrustStore())
+    .AddApplication(Applications.AppC, appc => appc
+        .UseSecretStore("appc-secretstore")
+        .AsCertificateAuthority()
+        .AsTrustStore());
 
 await set.RunAsync();

@@ -2,6 +2,8 @@
 
 Refs: assimalign/cohesion#979
 
+> **2026-09-26 addendum:** the gateways no longer call generated `Add<Member>` verbs and register their store, certificate-authority, trust and telemetry providers explicitly. The typed-descriptor table, the resource-kind rows in gap 10 and the telemetry discovery in gap 8 below describe the earlier SDK. See [Addendum 2026-09-26](#addendum-2026-09-26-explicit-providers) at the end; it was verified against the Cohesion working-tree assemblies (compile, `Build()` and `--mode describe`), **not** by a feed build.
+
 ## Result
 
 All 52 projects build, both clean Debug solution builds and the Release build compile, and the root application set describes all six applications. The examples now use the landed typed descriptors, Local launch profiles, SDK defaults, corrected resource names, TLS declarations and platform providers.
@@ -452,3 +454,79 @@ setup.ps1
 Repository checks: `git diff --check` and `git diff --cached --check` pass. The workflow-equivalent credential scan returns no matches (exit 1); the literal all-tracked scan matches only the unchanged guard workflow itself. No stale bridge/casing/no-op endpoint patterns remain in example code. The two deleted Flows folders are absent. All 48 shared Program/csproj twins still match across k8s and k8s-federated.
 
 Commit: **not committed**. The actual branch remains main; confirmation to commit there is pending because the final run note instead specified feature/dx-design-buildout and forbade switching branches. All item files are staged; no unrelated untracked files remain.
+
+## Addendum 2026-09-26: explicit providers
+
+Applies the owner-approved BYO identity/clients/stores design to the examples, against the uncommitted Cohesion working tree on `dev/dx-design-buildout` (HEAD `26bef204` plus the BYO changes). Nothing is staged or committed.
+
+### What the SDK and gateway no longer do
+
+- `Sdk.Gateway` generates `Manifests`, `Externals`, `Applications`, `References`, `UseGateway` and `Gateway.CreateBuilder`, but no per-resource `Add<Member>` verb and no resource-kind table. It injects no `<Area>.Client` package and no provider package.
+- The gateway resolves mount sources, certificates, trust, command inputs, telemetry and credentials only from `IApplicationModel.Providers`. `Build()` rejects a `<source>:<key>` mount without a registered provider, and rejects a source naming another application's resource (cross-application store sources are not supported yet).
+- The gateway development CA issues leaves only in Local; elsewhere a certificate mount without a source needs a registered certificate authority. The one exception is the authority resource's own leaf, which always comes from the gateway CA because the store cannot issue its first certificate. Telemetry is injected only when `Providers.Telemetry` is set.
+
+### Verb mapping
+
+| Before (generated) | After (area verb over the generated manifest) |
+| --- | --- |
+| `AddAcmeDatabase()`, `AddAcmeApi()` | `AddDatabase(Manifests.AcmeDatabase)`, `AddWeb(Manifests.AcmeApi)` |
+| `AddIdentityHub()` | `AddIdentityHub(Manifests.IdentityHub)` |
+| `AddNetworkingRezolvr()`, `AddNetworkingVpnGateway()` | `AddRezolvr(Manifests.NetworkingRezolvr)`, `AddVpnGateway(Manifests.NetworkingVpnGateway)` (now typed `IVpnGatewayResourceDescriptor`) |
+| `AddPlatformSecretStore()`, `AddPlatformLogSpace()`, `AddPlatformConfigurationStore()` | `AddSecretStore(Manifests.PlatformSecretStore)`, `AddLogSpace(Manifests.PlatformLogSpace)`, `AddConfigurationStore(Manifests.PlatformConfigurationStore)` |
+| `AddAppXSecretStore()`, `AddAppXDatabase(options => options.Storage.Size = "20Gi")`, `AddAppXApi()`, `AddAppXSpa()` | `AddSecretStore(Manifests.AppXSecretStore)`, `AddDatabase(Manifests.AppXDatabase, new DatabaseResourceOptions { Storage = { Size = "20Gi" } })`, `AddWeb(Manifests.AppXApi)`, `AddWeb(Manifests.AppXSpa)` |
+
+The `Manifests` member names equal the names the previous generator gave the verbs (`GatewaySourceWriter.FriendlyManifestName` is unchanged in the working tree), and were checked against each gateway's last generated `obj/**/cohesion/Gateway.g.cs`.
+
+### Provider registrations
+
+| Gateway | Registrations | Package references added |
+| --- | --- | --- |
+| Platform (k8s, k8s-federated) | `UseSecretStore(secrets).AsCertificateAuthority().AsTrustStore()`, `UseConfigurationStore(config)`, `Providers.Telemetry = ResourceTelemetrySink.FromResource(logs)` | SecretStore and ConfigurationStore `.ApplicationModel.Orchestration` |
+| AppA/AppB/AppC (k8s, k8s-federated) | `UseSecretStore(secrets).AsCertificateAuthority().AsTrustStore()` | SecretStore `.ApplicationModel.Orchestration` |
+| Identity, Networking, Acme | none: no store, and every secret mount is a `parameter:` source | none |
+| Root application set (k8s) | per member on `AddApplication(Applications.X, member => ...)`: Platform gets the same three registrations by resource name (`"platform-secretstore"`, `"platform-configuration-store"`, `"platform-logspace"`); each zone gets `UseSecretStore("appX-secretstore").AsCertificateAuthority().AsTrustStore()`; Identity and Networking register nothing | SecretStore and ConfigurationStore `.ApplicationModel.Orchestration` |
+
+The references use the existing mechanism, `CohesionPackageReference ... Version="$(CohesionVersion)"`, resolved from `cohesion-local` through the `Assimalign.Cohesion.*` mapping in `nuget.config`. `SecretStore.Client` and `ConfigurationStore.Client` now arrive only transitively through the Orchestration packages. The zone gateways keep their explicit `ConfigurationStore.ApplicationModel` reference for the typed remote binder. No example referenced the retired `IdentityHub.Client` or `Rezolvr.Client`.
+
+Behaviour is preserved where the earlier gateway inferred it: each application's own SecretStore was already its implicit certificate authority (`certs/<leaf>`, `ca/root`) and trust store, and Platform's LogSpace was the sink discovered by kind. Zone APIs still keep console logging. One deliberate difference: outside Local, a source-less certificate mount now fails loudly if the authority cannot issue, where the earlier gateway fell back to its development CA.
+
+In the zones, `UseSecretStore(secrets)` (the `appX-secretstore:certs/appX-api` source) and `AsTrustStore()` are load-bearing. `AsCertificateAuthority()` is not, today: the only source-less certificate mount in a zone is the SecretStore's own, which always comes from the gateway CA. It is kept for parity with the earlier implicit behaviour, so a future source-less zone endpoint gets a store-issued leaf outside Local instead of failing. Outside Local, no example relies on the development CA: Platform LogSpace's leaves come from the Platform SecretStore, every other TLS mount has an explicit source, and Identity's `tls` is the `identity-hub-tls` parameter.
+
+### Cross-application store sources replaced by parameters
+
+Four resource csprojs (IdentityHub and VpnGateway, in k8s and k8s-federated) read `platform-secretstore:<key>` from another application, which `Build()` now rejects. Each carries a follow-up comment naming the former source:
+
+| Mount | Before | After |
+| --- | --- | --- |
+| identity-hub `tls` | `platform-secretstore:certs/identity-hub` | `parameter:identity-hub-tls` (a PEM certificate + key bundle; the gateway validates it as a certificate) |
+| identity-hub `signing` | `platform-secretstore:identity/signing-keys` | `parameter:identity-signing-keys` |
+| networking-vpn-gateway `keys` | `platform-secretstore:networking/vpn-keys` | `parameter:networking-vpn-keys` |
+
+A Local run of Identity or Networking therefore needs these parameters bound (`--parameter name=value`, or the application's `parameters.json`), in addition to the existing `appa-client`, `appb-client` and `appc-client`. The `CohesionResourceReference` to the Platform SecretStore and the gateways' `RemoteReference(Externals.PlatformSecretStore, ...)` are kept, so the sources can be restored when cross-application store sources are supported. Platform ConfigurationStore's `platform-secretstore:certs/platform-configuration-store` is same-application and unchanged. The parameter names match the templates' landing zone.
+
+Comment-only edits, matching the templates: the zone SecretStore, Platform ConfigurationStore and Platform LogSpace csprojs now say their sources resolve, or telemetry is injected, only after the gateway registers them. `README.md`, `examples/ApplicationModel/README.md` and `examples/ApplicationModel/k8s/README.md` drop the generated-verb and Platform-sourced-secret statements. Those two area READMEs and `examples/ApplicationModel/k8s-federated/README.md` no longer say remote LogSpace injection is unavailable. `ResourceTelemetrySink.External` now exists; what zones lack is a credential for the Platform sink, because a gateway mints telemetry credentials only for a sink in its own application.
+
+### Verification
+
+- **Compile check, 0 warnings / 0 errors for all 8 distinct Program.cs files** (Acme, Identity, Networking, Platform, AppA, AppB, AppC, root set). Each was compiled in a scratch project against the assemblies built from the Cohesion working tree (`bin/Debug/net10.0` of ApplicationModel, ApplicationModel.Gateway and its dependencies, the eight area ApplicationModels, and both Orchestration packages; built 2026-09-26 09:16–09:32 with no newer sources), with a stub standing in for the generated `Gateway.g.cs`. A second, strict pass gave each gateway only the assemblies it actually receives (ApplicationModel.Gateway's closure, the area ApplicationModels Sdk.Gateway injects for its referenced areas, its explicit package references) and also compiled with 0 warnings / 0 errors (AppB and AppC differ from AppA only by name). Negative control: the HEAD `Acme.Gateway/Program.cs` fails the same harness with `CS1061 ... 'AddAcmeDatabase'`.
+- The six k8s-federated gateway twins, and the IdentityHub/VpnGateway twins, are byte-identical to k8s (`cmp`). Every edited file keeps its existing working-tree line endings (`git ls-files --eol`); the index stays LF.
+- **Reviewer pass: `Build()` and `--mode describe` executed.** Each gateway's `Program.cs` (unmodified, linked) was compiled with its last generated `Manifests`/`Externals`/`Applications`/`References` sections, the three mount sources above rewritten to their `parameter:` form, a `Gateway.CreateBuilder` without in-process bindings, and a Local-only `UseGateway` stand-in. Compile references were only what `Sdk.Gateway` injects plus the gateway's own package references. All 13 gateways (k8s, k8s-federated, Acme) built with 0 warnings / 0 errors and exited 0 in `--mode describe` under both `--environment Local` and `Development`, so `ApplicationProviderValidation` and the Local gateway's validation passed. The root set, with each member declaration pointed at that member's harness executable, exited 0 in Local describe and resolved all six models; outside Local it reads exported models, so it was not run there. Negative controls failed as intended:
+  - AppA without `UseSecretStore(...)`: `Build()` names `appa-secretstore` and the Orchestration package to reference.
+  - Identity with the old `platform-secretstore:certs/identity-hub` source: `Build()` rejects it as a cross-application store source.
+  - The set with `AddApplication(Applications.AppA)` and no callback: member `appa` fails on the unregistered `appa-secretstore` source.
+  - The set registering `UseSecretStore("platform-secretstore")` on AppA: rejected, because that store is not a resource of `appa`.
+- **Not run:** `dotnet build` or `describe` of the examples themselves. The local feed predates these changes and was not repacked (see below), so a restore today would use the old generated verbs and could not resolve the Orchestration packages. MSBuild evaluation of the new `CohesionPackageReference` items was checked by reading the SDK targets, not by execution. Real `Gateway.g.cs` generation, in-process bindings, and Local/InProcess runs are also unverified.
+
+### What must be packed before the examples build
+
+`cohesion/_out/packages` is stale for every package the examples use: the `10.0.0-preview.1.local` libraries are from `b171f4c7` (2026-09-21) and the SDKs and framework packs from `2da3e2c9` (2026-09-22), per each nuspec's repository commit. Every source directory below has changed since, and the Orchestration packages are absent.
+
+1. **Cohesion, from the current working tree:** `pwsh installer/scripts/Install-Local.ps1`, which packs SDKs, frameworks and inventory libraries at `10.0.0-preview.1.local`. The minimum the examples need:
+   - SDKs: `Sdk`, `Sdk.ApplicationModel`, `Sdk.Gateway` (no verbs, no client injection), and `Sdk.Web`, `Sdk.Database`, `Sdk.SecretStore`, `Sdk.ConfigurationStore`, `Sdk.LogSpace`, `Sdk.IdentityHub`, `Sdk.Rezolvr`, `Sdk.VpnGateway`.
+   - New packages: `SecretStore.ApplicationModel.Orchestration` and `ConfigurationStore.ApplicationModel.Orchestration`.
+   - Changed by BYO in the working tree: `ApplicationModel`, `ApplicationModel.Gateway`, `ApplicationModel.Gateway.ControlPlane`, `ApplicationModel.Gateway.InProcess`, `Hosting.Resources`, `Core`, `IdentityModel.Token.JsonWebToken`, `SecretStore.ApplicationModel`, and the resource-side credential verification in `SecretStore.Hosting`, `ConfigurationStore.Hosting`, `IdentityHub.Hosting`, `LogSpace.Hosting`, `Rezolvr.Hosting` and `Web.Hosting.Resources`. The Hosting modules reach the example resources only through the `App.<Area>` runtime packs, so stale framework packs would pair the new gateway with the old resource-side token verification.
+   - Their closure: `SecretStore.Client`, `ConfigurationStore.Client`, `Connections`, `Hosting`, `Hosting.Health`, `IdentityModel`, `IdentityModel.Token`, `Security.DataProtection`, and the eight area ApplicationModels (`Web`, `Database`, `SecretStore`, `ConfigurationStore`, `LogSpace`, `IdentityHub`, `Rezolvr`, `VpnGateway`).
+   - Frameworks: `App` and `App.<Area>` Ref and host-RID Runtime packs for the same eight areas, for the resource projects and the in-process gateways.
+2. **cohesion-platforms, after step 1:** repack `ApplicationModel.Gateway.Containers`, `.Docker` and `.Kubernetes` (`10.0.0-preview.1`). Their nuspecs pin `ApplicationModel.Gateway [10.0.0-preview.1.local]` exactly and were compiled against the 2026-09-21 gateway. Their `src` uses none of the removed or renamed members, but binary compatibility with the new gateway is unverified. The zone gateways and Acme select Docker and Kubernetes. The repack keeps the version `10.0.0-preview.1`, which is already extracted in the global packages folder, so remove those three `~/.nuget/packages/assimalign.cohesion.applicationmodel.gateway.*/10.0.0-preview.1` entries first or restore will keep the old binaries.
+
+After both packs, the acceptance run is: restore with a fresh cache, build `Assimalign.Cohesion.Examples.slnx`, then `--mode describe` for the AppA gateway, the federated Platform gateway, Acme, and the root set. The `examples-build` workflow restores from the released feed, so it also needs a published release that contains both Orchestration packages; both are in the release inventory (`CohesionPackaging.psm1`).
