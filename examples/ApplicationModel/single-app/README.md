@@ -10,7 +10,7 @@ dotnet run --project Acme.Gateway -- --gateway docker --mode render
 
 Local supervises two child processes; InProcess invokes both entries in one gateway process. Acme.Api deliberately keeps plain HTTP as the scale-down story. Its `/bindings` response reports the observed database endpoint and the generated Customers:PageSize default.
 
-The verified package revision builds and describes this model, but both run modes stop at database readiness: the SQL DDL executor cannot migrate the schema's principals and grants yet. The explicit Customers table name now matches its grant; the example retains the intended permissions. No successful endpoint probe was established in this pass.
+The verified package revision builds and describes this model. Its Database program declares no principals or grants (cohesion owner decision 58 of 2026-10-09: the SQL engine refuses them until their DDL exists), so its schema provisions while the program is built. Endpoint probes have not been re-run since that change.
 
 Docker and Kubernetes are selected provider packages at `10.0.0-preview.1`. Both renderers require published resource images in the manifests before they can produce YAML. Kubernetes rendering also requires `--cohesion-system-image <digest-pinned-image>` and `--cohesion-system-storage 1Gi`; see the [root README](../../README.md). Neither offline render needs a daemon or cluster. Kubernetes selects JIT for the gateway.
 

@@ -28,7 +28,7 @@ Each zone gateway adds its SecretStore and requests an API certificate, then ord
 
 Full runs require a reachable and authorized Platform command channel. The localhost external fallbacks preserve standalone bindings but cannot provide a missing peer gateway. Identity additionally needs the parameters identity-hub-tls, identity-signing-keys, appa-client, appb-client and appc-client, and Networking needs networking-vpn-keys: cross-application store sources are not supported yet, so the former `platform-secretstore:` sources are parameters until the store resources mature. No credential material is checked in.
 
-At the verified package revision, Local and InProcess runs stop before readiness: SecretStore's host content root disagrees with its ambient resource context, and the SQL migration executor rejects declared principals/grants. The examples keep those schema permissions. Explicit table names now match the grants, correcting a separate example-side validation error. These upstream failures prevented endpoint probes and telemetry delivery checks; HTTPS declarations and dependency ordering are verified in the model only.
+At the verified package revision, Local and InProcess runs stop before readiness: SecretStore's host content root disagrees with its ambient resource context. The Database programs no longer declare principals or grants (cohesion owner decision 58 of 2026-10-09), and their schemas, foreign keys included, provision while each program is built. The SecretStore failure prevented endpoint probes and telemetry delivery checks; HTTPS declarations and dependency ordering are verified in the model only.
 
 ## TLS and telemetry
 
