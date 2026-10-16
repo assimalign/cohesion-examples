@@ -62,7 +62,7 @@ dotnet run --project examples/libraries/ApplicationModel/k8s/Zones/AppA/Example.
 $image = 'example/gateway@sha256:' + ('0' * 64)
 dotnet run --project examples/libraries/ApplicationModel/k8s/Zones/AppA/Example.AppA.Gateway -- --gateway kubernetes --mode render --environment Development --cohesion-system-image $image --cohesion-system-storage 1Gi --control-plane-expose loadbalancer
 
-dotnet tool install Assimalign.Cohesion.Cli --tool-path .cohesion/tools --version 10.0.0-preview.0.ci.3 --configfile nuget.config
+dotnet tool install Assimalign.Cohesion.Cli --tool-path .cohesion/tools --version 10.0.0-preview.0.ci.21 --configfile nuget.config
 # Run cohesion status from a gateway project directory; cohesion new --help lists template usage.
 ```
 

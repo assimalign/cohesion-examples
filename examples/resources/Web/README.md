@@ -84,10 +84,7 @@ Their settings files are empty on purpose, and their code is the server configur
 
 ## Packages outside the App.Web framework
 
-`Sdk.Web` delivers every Web package through the `App.Web` shared framework, with three
-exceptions that these examples reference explicitly:
-
-- `Assimalign.Cohesion.Web.Testing` and `Assimalign.Cohesion.Web.OpenApi` ship on NuGet only. They
-  are referenced with `Version="$(CohesionVersion)"`, the version `global.json` pins.
-- The RateLimiting examples reference `System.Threading.RateLimiting`, which holds the limiter
-  algorithms. `App.Web` does not carry it yet.
+`Sdk.Web` delivers every Web package through the `App.Web` shared framework, with two
+exceptions that these examples reference explicitly: `Assimalign.Cohesion.Web.Testing` and
+`Assimalign.Cohesion.Web.OpenApi` ship on NuGet only. They are referenced with
+`Version="$(CohesionVersion)"`, the version `global.json` pins.
