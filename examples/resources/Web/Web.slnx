@@ -1,0 +1,141 @@
+<Solution>
+  <Folder Name="/Antiforgery/">
+    <Project Path="Antiforgery\Example1\Antiforgery.Example1.csproj" />
+    <Project Path="Antiforgery\Example2\Antiforgery.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Api/">
+    <Project Path="Api\Example1\Api.Example1.csproj" />
+    <Project Path="Api\Example2\Api.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Authentication/">
+    <Project Path="Authentication\Example1\Authentication.Example1.csproj" />
+    <Project Path="Authentication\Example2\Authentication.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Authentication.Bearer/">
+    <Project Path="Authentication.Bearer\Example1\Authentication.Bearer.Example1.csproj" />
+    <Project Path="Authentication.Bearer\Example2\Authentication.Bearer.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Authentication.Certificate/">
+    <Project Path="Authentication.Certificate\Example1\Authentication.Certificate.Example1.csproj" />
+    <Project Path="Authentication.Certificate\Example2\Authentication.Certificate.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Authentication.Cookie/">
+    <Project Path="Authentication.Cookie\Example1\Authentication.Cookie.Example1.csproj" />
+    <Project Path="Authentication.Cookie\Example2\Authentication.Cookie.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Authorization/">
+    <Project Path="Authorization\Example1\Authorization.Example1.csproj" />
+    <Project Path="Authorization\Example2\Authorization.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Caching/">
+    <Project Path="Caching\Example1\Caching.Example1.csproj" />
+    <Project Path="Caching\Example2\Caching.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Compression/">
+    <Project Path="Compression\Example1\Compression.Example1.csproj" />
+    <Project Path="Compression\Example2\Compression.Example2.csproj" />
+  </Folder>
+  <Folder Name="/CookiePolicy/">
+    <Project Path="CookiePolicy\Example1\CookiePolicy.Example1.csproj" />
+    <Project Path="CookiePolicy\Example2\CookiePolicy.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Cors/">
+    <Project Path="Cors\Example1\Cors.Example1.csproj" />
+    <Project Path="Cors\Example2\Cors.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Diagnostics/">
+    <Project Path="Diagnostics\Example1\Diagnostics.Example1.csproj" />
+    <Project Path="Diagnostics\Example2\Diagnostics.Example2.csproj" />
+  </Folder>
+  <Folder Name="/ErrorHandling/">
+    <Project Path="ErrorHandling\Example1\ErrorHandling.Example1.csproj" />
+    <Project Path="ErrorHandling\Example2\ErrorHandling.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Forms/">
+    <Project Path="Forms\Example1\Forms.Example1.csproj" />
+    <Project Path="Forms\Example2\Forms.Example2.csproj" />
+  </Folder>
+  <Folder Name="/ForwardedHeaders/">
+    <Project Path="ForwardedHeaders\Example1\ForwardedHeaders.Example1.csproj" />
+    <Project Path="ForwardedHeaders\Example2\ForwardedHeaders.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Health/">
+    <Project Path="Health\Example1\Health.Example1.csproj" />
+    <Project Path="Health\Example2\Health.Example2.csproj" />
+  </Folder>
+  <Folder Name="/HostFiltering/">
+    <Project Path="HostFiltering\Example1\HostFiltering.Example1.csproj" />
+    <Project Path="HostFiltering\Example2\HostFiltering.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Hosting/">
+    <Project Path="Hosting\Example1\Hosting.Example1.csproj" />
+    <Project Path="Hosting\Example2\Hosting.Example2.csproj" />
+  </Folder>
+  <Folder Name="/HttpsPolicy/">
+    <Project Path="HttpsPolicy\Example1\HttpsPolicy.Example1.csproj" />
+    <Project Path="HttpsPolicy\Example2\HttpsPolicy.Example2.csproj" />
+  </Folder>
+  <Folder Name="/OpenApi/">
+    <Project Path="OpenApi\Example1\OpenApi.Example1.csproj" />
+    <Project Path="OpenApi\Example2\OpenApi.Example2.csproj" />
+  </Folder>
+  <Folder Name="/ProblemDetails/">
+    <Project Path="ProblemDetails\Example1\ProblemDetails.Example1.csproj" />
+    <Project Path="ProblemDetails\Example2\ProblemDetails.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Query/">
+    <Project Path="Query\Example1\Query.Example1.csproj" />
+    <Project Path="Query\Example2\Query.Example2.csproj" />
+  </Folder>
+  <Folder Name="/RateLimiting/">
+    <Project Path="RateLimiting\Example1\RateLimiting.Example1.csproj" />
+    <Project Path="RateLimiting\Example2\RateLimiting.Example2.csproj" />
+  </Folder>
+  <Folder Name="/RequestTimeouts/">
+    <Project Path="RequestTimeouts\Example1\RequestTimeouts.Example1.csproj" />
+    <Project Path="RequestTimeouts\Example2\RequestTimeouts.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Rewrite/">
+    <Project Path="Rewrite\Example1\Rewrite.Example1.csproj" />
+    <Project Path="Rewrite\Example2\Rewrite.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Routing/">
+    <Project Path="Routing\Example1\Routing.Example1.csproj" />
+    <Project Path="Routing\Example2\Routing.Example2.csproj" />
+  </Folder>
+  <Folder Name="/SecurityHeaders/">
+    <Project Path="SecurityHeaders\Example1\SecurityHeaders.Example1.csproj" />
+    <Project Path="SecurityHeaders\Example2\SecurityHeaders.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Serialization/">
+    <Project Path="Serialization\Example1\Serialization.Example1.csproj" />
+    <Project Path="Serialization\Example2\Serialization.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Server/">
+    <Project Path="Server\Example1\Server.Example1.csproj" />
+    <Project Path="Server\Example2\Server.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Sessions/">
+    <Project Path="Sessions\Example1\Sessions.Example1.csproj" />
+    <Project Path="Sessions\Example2\Sessions.Example2.csproj" />
+  </Folder>
+  <Folder Name="/StaticFiles/">
+    <Project Path="StaticFiles\Example1\StaticFiles.Example1.csproj" />
+    <Project Path="StaticFiles\Example2\StaticFiles.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Testing/">
+    <Project Path="Testing\Example1\Testing.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Testing/Example2/">
+    <Project Path="Testing\Example2\App\Testing.Example2.App.csproj" />
+    <Project Path="Testing\Example2\Tests\Testing.Example2.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Validation/">
+    <Project Path="Validation\Example1\Validation.Example1.csproj" />
+    <Project Path="Validation\Example2\Validation.Example2.csproj" />
+  </Folder>
+  <Folder Name="/WebSockets/">
+    <Project Path="WebSockets\Example1\WebSockets.Example1.csproj" />
+    <Project Path="WebSockets\Example2\WebSockets.Example2.csproj" />
+  </Folder>
+</Solution>

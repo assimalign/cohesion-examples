@@ -1,0 +1,6 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Web">
+  <ItemGroup>
+    <!-- Sdk.Web copies wwwroot to the output; the downloads folder needs its own item. -->
+    <None Update="downloads\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

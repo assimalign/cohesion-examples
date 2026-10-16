@@ -1,0 +1,7 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Web">
+  <ItemGroup>
+    <!-- Web.OpenApi ships on NuGet only, not in the App.Web framework. $(CohesionVersion) is the SDK
+         version global.json pins. -->
+    <PackageReference Include="Assimalign.Cohesion.Web.OpenApi" Version="$(CohesionVersion)" />
+  </ItemGroup>
+</Project>

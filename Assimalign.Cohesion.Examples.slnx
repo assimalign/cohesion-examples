@@ -8,83 +8,222 @@
     <File Path="setup.ps1" />
   </Folder>
   <Folder Name="/single-app/">
-    <Project Path="examples\ApplicationModel\single-app\Acme.Api\Acme.Api.csproj" />
-    <Project Path="examples\ApplicationModel\single-app\Acme.Database\Acme.Database.csproj" />
-    <Project Path="examples\ApplicationModel\single-app\Acme.Gateway\Acme.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\single-app\Acme.Api\Acme.Api.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\single-app\Acme.Database\Acme.Database.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\single-app\Acme.Gateway\Acme.Gateway.csproj" />
   </Folder>
   <Folder Name="/k8s/Gateway/">
-    <Project Path="examples\ApplicationModel\k8s\Gateway\Example.Gateway\Example.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Gateway\Example.Gateway\Example.Gateway.csproj" />
   </Folder>
   <Folder Name="/k8s/Identity/">
-    <Project Path="examples\ApplicationModel\k8s\Identity\Example.Identity.Gateway\Example.Identity.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Identity\Example.Identity.IdentityHub\Example.Identity.IdentityHub.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Identity\Example.Identity.Gateway\Example.Identity.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Identity\Example.Identity.IdentityHub\Example.Identity.IdentityHub.csproj" />
   </Folder>
   <Folder Name="/k8s/Networking/">
-    <Project Path="examples\ApplicationModel\k8s\Networking\Example.Networking.Gateway\Example.Networking.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Networking\Example.Networking.Rezolvr\Example.Networking.Rezolvr.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Networking\Example.Networking.VpnGateway\Example.Networking.VpnGateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Networking\Example.Networking.Gateway\Example.Networking.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Networking\Example.Networking.Rezolvr\Example.Networking.Rezolvr.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Networking\Example.Networking.VpnGateway\Example.Networking.VpnGateway.csproj" />
   </Folder>
   <Folder Name="/k8s/Platform/">
-    <Project Path="examples\ApplicationModel\k8s\Platform\Example.Platform.ConfigurationStore\Example.Platform.ConfigurationStore.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Platform\Example.Platform.Gateway\Example.Platform.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Platform\Example.Platform.LogSpace\Example.Platform.LogSpace.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Platform\Example.Platform.SecretStore\Example.Platform.SecretStore.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Platform\Example.Platform.ConfigurationStore\Example.Platform.ConfigurationStore.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Platform\Example.Platform.Gateway\Example.Platform.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Platform\Example.Platform.LogSpace\Example.Platform.LogSpace.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Platform\Example.Platform.SecretStore\Example.Platform.SecretStore.csproj" />
   </Folder>
   <Folder Name="/k8s/Zones/AppA/">
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppA\Example.AppA.Api\Example.AppA.Api.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppA\Example.AppA.Database\Example.AppA.Database.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppA\Example.AppA.Gateway\Example.AppA.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppA\Example.AppA.SecretStore\Example.AppA.SecretStore.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppA\Example.AppA.Spa\Example.AppA.Spa.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppA\Example.AppA.Api\Example.AppA.Api.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppA\Example.AppA.Database\Example.AppA.Database.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppA\Example.AppA.Gateway\Example.AppA.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppA\Example.AppA.SecretStore\Example.AppA.SecretStore.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppA\Example.AppA.Spa\Example.AppA.Spa.csproj" />
   </Folder>
   <Folder Name="/k8s/Zones/AppB/">
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppB\Example.AppB.Api\Example.AppB.Api.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppB\Example.AppB.Database\Example.AppB.Database.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppB\Example.AppB.Gateway\Example.AppB.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppB\Example.AppB.SecretStore\Example.AppB.SecretStore.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppB\Example.AppB.Spa\Example.AppB.Spa.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppB\Example.AppB.Api\Example.AppB.Api.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppB\Example.AppB.Database\Example.AppB.Database.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppB\Example.AppB.Gateway\Example.AppB.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppB\Example.AppB.SecretStore\Example.AppB.SecretStore.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppB\Example.AppB.Spa\Example.AppB.Spa.csproj" />
   </Folder>
   <Folder Name="/k8s/Zones/AppC/">
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppC\Example.AppC.Api\Example.AppC.Api.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppC\Example.AppC.Database\Example.AppC.Database.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppC\Example.AppC.Gateway\Example.AppC.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppC\Example.AppC.SecretStore\Example.AppC.SecretStore.csproj" />
-    <Project Path="examples\ApplicationModel\k8s\Zones\AppC\Example.AppC.Spa\Example.AppC.Spa.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppC\Example.AppC.Api\Example.AppC.Api.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppC\Example.AppC.Database\Example.AppC.Database.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppC\Example.AppC.Gateway\Example.AppC.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppC\Example.AppC.SecretStore\Example.AppC.SecretStore.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s\Zones\AppC\Example.AppC.Spa\Example.AppC.Spa.csproj" />
   </Folder>
   <Folder Name="/k8s-federated/Identity/">
-    <Project Path="examples\ApplicationModel\k8s-federated\Identity\Example.Identity.Gateway\Example.Identity.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Identity\Example.Identity.IdentityHub\Example.Identity.IdentityHub.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Identity\Example.Identity.Gateway\Example.Identity.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Identity\Example.Identity.IdentityHub\Example.Identity.IdentityHub.csproj" />
   </Folder>
   <Folder Name="/k8s-federated/Networking/">
-    <Project Path="examples\ApplicationModel\k8s-federated\Networking\Example.Networking.Gateway\Example.Networking.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Networking\Example.Networking.Rezolvr\Example.Networking.Rezolvr.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Networking\Example.Networking.VpnGateway\Example.Networking.VpnGateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Networking\Example.Networking.Gateway\Example.Networking.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Networking\Example.Networking.Rezolvr\Example.Networking.Rezolvr.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Networking\Example.Networking.VpnGateway\Example.Networking.VpnGateway.csproj" />
   </Folder>
   <Folder Name="/k8s-federated/Platform/">
-    <Project Path="examples\ApplicationModel\k8s-federated\Platform\Example.Platform.ConfigurationStore\Example.Platform.ConfigurationStore.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Platform\Example.Platform.Gateway\Example.Platform.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Platform\Example.Platform.LogSpace\Example.Platform.LogSpace.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Platform\Example.Platform.SecretStore\Example.Platform.SecretStore.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Platform\Example.Platform.ConfigurationStore\Example.Platform.ConfigurationStore.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Platform\Example.Platform.Gateway\Example.Platform.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Platform\Example.Platform.LogSpace\Example.Platform.LogSpace.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Platform\Example.Platform.SecretStore\Example.Platform.SecretStore.csproj" />
   </Folder>
   <Folder Name="/k8s-federated/Zones/AppA/">
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppA\Example.AppA.Api\Example.AppA.Api.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppA\Example.AppA.Database\Example.AppA.Database.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppA\Example.AppA.Gateway\Example.AppA.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppA\Example.AppA.SecretStore\Example.AppA.SecretStore.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppA\Example.AppA.Spa\Example.AppA.Spa.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppA\Example.AppA.Api\Example.AppA.Api.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppA\Example.AppA.Database\Example.AppA.Database.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppA\Example.AppA.Gateway\Example.AppA.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppA\Example.AppA.SecretStore\Example.AppA.SecretStore.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppA\Example.AppA.Spa\Example.AppA.Spa.csproj" />
   </Folder>
   <Folder Name="/k8s-federated/Zones/AppB/">
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppB\Example.AppB.Api\Example.AppB.Api.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppB\Example.AppB.Database\Example.AppB.Database.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppB\Example.AppB.Gateway\Example.AppB.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppB\Example.AppB.SecretStore\Example.AppB.SecretStore.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppB\Example.AppB.Spa\Example.AppB.Spa.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppB\Example.AppB.Api\Example.AppB.Api.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppB\Example.AppB.Database\Example.AppB.Database.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppB\Example.AppB.Gateway\Example.AppB.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppB\Example.AppB.SecretStore\Example.AppB.SecretStore.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppB\Example.AppB.Spa\Example.AppB.Spa.csproj" />
   </Folder>
   <Folder Name="/k8s-federated/Zones/AppC/">
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppC\Example.AppC.Api\Example.AppC.Api.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppC\Example.AppC.Database\Example.AppC.Database.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppC\Example.AppC.Gateway\Example.AppC.Gateway.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppC\Example.AppC.SecretStore\Example.AppC.SecretStore.csproj" />
-    <Project Path="examples\ApplicationModel\k8s-federated\Zones\AppC\Example.AppC.Spa\Example.AppC.Spa.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppC\Example.AppC.Api\Example.AppC.Api.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppC\Example.AppC.Database\Example.AppC.Database.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppC\Example.AppC.Gateway\Example.AppC.Gateway.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppC\Example.AppC.SecretStore\Example.AppC.SecretStore.csproj" />
+    <Project Path="examples\libraries\ApplicationModel\k8s-federated\Zones\AppC\Example.AppC.Spa\Example.AppC.Spa.csproj" />
+  </Folder>
+  <Folder Name="/Web/Antiforgery/">
+    <Project Path="examples\resources\Web\Antiforgery\Example1\Antiforgery.Example1.csproj" />
+    <Project Path="examples\resources\Web\Antiforgery\Example2\Antiforgery.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Api/">
+    <Project Path="examples\resources\Web\Api\Example1\Api.Example1.csproj" />
+    <Project Path="examples\resources\Web\Api\Example2\Api.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Authentication/">
+    <Project Path="examples\resources\Web\Authentication\Example1\Authentication.Example1.csproj" />
+    <Project Path="examples\resources\Web\Authentication\Example2\Authentication.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Authentication.Bearer/">
+    <Project Path="examples\resources\Web\Authentication.Bearer\Example1\Authentication.Bearer.Example1.csproj" />
+    <Project Path="examples\resources\Web\Authentication.Bearer\Example2\Authentication.Bearer.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Authentication.Certificate/">
+    <Project Path="examples\resources\Web\Authentication.Certificate\Example1\Authentication.Certificate.Example1.csproj" />
+    <Project Path="examples\resources\Web\Authentication.Certificate\Example2\Authentication.Certificate.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Authentication.Cookie/">
+    <Project Path="examples\resources\Web\Authentication.Cookie\Example1\Authentication.Cookie.Example1.csproj" />
+    <Project Path="examples\resources\Web\Authentication.Cookie\Example2\Authentication.Cookie.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Authorization/">
+    <Project Path="examples\resources\Web\Authorization\Example1\Authorization.Example1.csproj" />
+    <Project Path="examples\resources\Web\Authorization\Example2\Authorization.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Caching/">
+    <Project Path="examples\resources\Web\Caching\Example1\Caching.Example1.csproj" />
+    <Project Path="examples\resources\Web\Caching\Example2\Caching.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Compression/">
+    <Project Path="examples\resources\Web\Compression\Example1\Compression.Example1.csproj" />
+    <Project Path="examples\resources\Web\Compression\Example2\Compression.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/CookiePolicy/">
+    <Project Path="examples\resources\Web\CookiePolicy\Example1\CookiePolicy.Example1.csproj" />
+    <Project Path="examples\resources\Web\CookiePolicy\Example2\CookiePolicy.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Cors/">
+    <Project Path="examples\resources\Web\Cors\Example1\Cors.Example1.csproj" />
+    <Project Path="examples\resources\Web\Cors\Example2\Cors.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Diagnostics/">
+    <Project Path="examples\resources\Web\Diagnostics\Example1\Diagnostics.Example1.csproj" />
+    <Project Path="examples\resources\Web\Diagnostics\Example2\Diagnostics.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/ErrorHandling/">
+    <Project Path="examples\resources\Web\ErrorHandling\Example1\ErrorHandling.Example1.csproj" />
+    <Project Path="examples\resources\Web\ErrorHandling\Example2\ErrorHandling.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Forms/">
+    <Project Path="examples\resources\Web\Forms\Example1\Forms.Example1.csproj" />
+    <Project Path="examples\resources\Web\Forms\Example2\Forms.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/ForwardedHeaders/">
+    <Project Path="examples\resources\Web\ForwardedHeaders\Example1\ForwardedHeaders.Example1.csproj" />
+    <Project Path="examples\resources\Web\ForwardedHeaders\Example2\ForwardedHeaders.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Health/">
+    <Project Path="examples\resources\Web\Health\Example1\Health.Example1.csproj" />
+    <Project Path="examples\resources\Web\Health\Example2\Health.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/HostFiltering/">
+    <Project Path="examples\resources\Web\HostFiltering\Example1\HostFiltering.Example1.csproj" />
+    <Project Path="examples\resources\Web\HostFiltering\Example2\HostFiltering.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Hosting/">
+    <Project Path="examples\resources\Web\Hosting\Example1\Hosting.Example1.csproj" />
+    <Project Path="examples\resources\Web\Hosting\Example2\Hosting.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/HttpsPolicy/">
+    <Project Path="examples\resources\Web\HttpsPolicy\Example1\HttpsPolicy.Example1.csproj" />
+    <Project Path="examples\resources\Web\HttpsPolicy\Example2\HttpsPolicy.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/OpenApi/">
+    <Project Path="examples\resources\Web\OpenApi\Example1\OpenApi.Example1.csproj" />
+    <Project Path="examples\resources\Web\OpenApi\Example2\OpenApi.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/ProblemDetails/">
+    <Project Path="examples\resources\Web\ProblemDetails\Example1\ProblemDetails.Example1.csproj" />
+    <Project Path="examples\resources\Web\ProblemDetails\Example2\ProblemDetails.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Query/">
+    <Project Path="examples\resources\Web\Query\Example1\Query.Example1.csproj" />
+    <Project Path="examples\resources\Web\Query\Example2\Query.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/RateLimiting/">
+    <Project Path="examples\resources\Web\RateLimiting\Example1\RateLimiting.Example1.csproj" />
+    <Project Path="examples\resources\Web\RateLimiting\Example2\RateLimiting.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/RequestTimeouts/">
+    <Project Path="examples\resources\Web\RequestTimeouts\Example1\RequestTimeouts.Example1.csproj" />
+    <Project Path="examples\resources\Web\RequestTimeouts\Example2\RequestTimeouts.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Rewrite/">
+    <Project Path="examples\resources\Web\Rewrite\Example1\Rewrite.Example1.csproj" />
+    <Project Path="examples\resources\Web\Rewrite\Example2\Rewrite.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Routing/">
+    <Project Path="examples\resources\Web\Routing\Example1\Routing.Example1.csproj" />
+    <Project Path="examples\resources\Web\Routing\Example2\Routing.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/SecurityHeaders/">
+    <Project Path="examples\resources\Web\SecurityHeaders\Example1\SecurityHeaders.Example1.csproj" />
+    <Project Path="examples\resources\Web\SecurityHeaders\Example2\SecurityHeaders.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Serialization/">
+    <Project Path="examples\resources\Web\Serialization\Example1\Serialization.Example1.csproj" />
+    <Project Path="examples\resources\Web\Serialization\Example2\Serialization.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Server/">
+    <Project Path="examples\resources\Web\Server\Example1\Server.Example1.csproj" />
+    <Project Path="examples\resources\Web\Server\Example2\Server.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Sessions/">
+    <Project Path="examples\resources\Web\Sessions\Example1\Sessions.Example1.csproj" />
+    <Project Path="examples\resources\Web\Sessions\Example2\Sessions.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/StaticFiles/">
+    <Project Path="examples\resources\Web\StaticFiles\Example1\StaticFiles.Example1.csproj" />
+    <Project Path="examples\resources\Web\StaticFiles\Example2\StaticFiles.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/Testing/">
+    <Project Path="examples\resources\Web\Testing\Example1\Testing.Example1.csproj" />
+  </Folder>
+  <Folder Name="/Web/Testing/Example2/">
+    <Project Path="examples\resources\Web\Testing\Example2\App\Testing.Example2.App.csproj" />
+    <Project Path="examples\resources\Web\Testing\Example2\Tests\Testing.Example2.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Web/Validation/">
+    <Project Path="examples\resources\Web\Validation\Example1\Validation.Example1.csproj" />
+    <Project Path="examples\resources\Web\Validation\Example2\Validation.Example2.csproj" />
+  </Folder>
+  <Folder Name="/Web/WebSockets/">
+    <Project Path="examples\resources\Web\WebSockets\Example1\WebSockets.Example1.csproj" />
+    <Project Path="examples\resources\Web\WebSockets\Example2\WebSockets.Example2.csproj" />
   </Folder>
 </Solution>

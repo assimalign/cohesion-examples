@@ -1,0 +1,13 @@
+<Project>
+  <!--
+    The platform gateway packages (Assimalign.Cohesion.ApplicationModel.Gateway.Docker, .Kubernetes,
+    .Containers) are published only at 10.0.0-preview.1, which requires Cohesion >= 10.0.0-preview.1.
+    global.json pins a Cohesion CI build (10.0.0-preview.0.ci.N), and CI builds sort below the release
+    they lead to by design, so restore reports a downgrade (NU1605) in every gateway that selects a
+    platform provider. Those gateways accept the downgrade until cohesion-platforms publishes CI builds
+    of its own; then pin CohesionPlatformsVersion to one and delete this file.
+  -->
+  <PropertyGroup Condition="'$(CohesionPlatformsVersion)' != ''">
+    <NoWarn>$(NoWarn);NU1605</NoWarn>
+  </PropertyGroup>
+</Project>

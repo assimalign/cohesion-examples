@@ -4,3 +4,6 @@ obj/
 .cohesion/
 parameters.json
 *.user
+
+# Client certificates the Web certificate examples write at startup
+*.pfx

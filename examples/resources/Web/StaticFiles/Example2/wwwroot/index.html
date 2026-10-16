@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Single-page app</title>
+</head>
+<body>
+  <h1>Single-page app</h1>
+  <p>Client-side route: <code id="route"></code></p>
+  <p>API says: <code id="ping">...</code></p>
+  <p><a href="/downloads/release-notes.txt">Release notes</a></p>
+  <script>
+    document.getElementById("route").textContent = location.pathname;
+    fetch("/api/ping").then(response => response.text()).then(text => {
+      document.getElementById("ping").textContent = text;
+    });
+  </script>
+</body>
+</html>
