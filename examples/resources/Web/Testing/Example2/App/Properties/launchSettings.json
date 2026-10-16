@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Testing.Example2.App": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "COHESION_ENVIRONMENT": "Local"
+      }
+    }
+  }
+}

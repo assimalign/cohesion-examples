@@ -1,2 +1,5 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.Web">
+	<PropertyGroup>
+		<PublishAot>true</PublishAot>
+	</PropertyGroup>
 </Project>

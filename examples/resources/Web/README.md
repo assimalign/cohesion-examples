@@ -21,6 +21,28 @@ says what it shows and gives the commands to try it.
   `https://localhost:5001`.
 - **Build them all:** `dotnet build Web.slnx`.
 
+## Environments and listeners
+
+Every application has `Properties/launchSettings.json`, which sets `COHESION_ENVIRONMENT` to
+`Local` for `dotnet run`, and one settings file per environment. The host reads `appsettings.json`,
+then `appsettings.{environment}.json`, so the file for the current environment declares the
+listeners under `Http:Endpoints`:
+
+| Environment | Listener | Limits |
+| --- | --- | --- |
+| `Local` | `http://localhost:5000` | defaults |
+| `Development` | `http://0.0.0.0:8080` | defaults |
+| `Staging`, `Production` | `http://0.0.0.0:8080` | 10 MiB request bodies, 1-minute keep-alive, 1000 connections |
+
+Without a launch profile (`dotnet run --no-launch-profile`, or the built executable started
+directly) the environment is `Production`. Override any value with a `COHESION_CONFIG__` variable
+(`COHESION_CONFIG__Http__Endpoints__Main__Port=9000`) or the command line
+(`--Http:Endpoints:Main:Port=9000`).
+
+The Authentication.Certificate examples, HttpsPolicy/Example2 and Server/Example2 configure their
+listeners in code with `builder.Server.UseServer(...)`, which turns configuration binding off.
+Their settings files are empty on purpose, and their code is the server configuration.
+
 ## Examples
 
 | Package | Example 1 | Example 2 |

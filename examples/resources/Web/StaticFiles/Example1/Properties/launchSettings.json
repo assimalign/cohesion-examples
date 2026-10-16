@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "StaticFiles.Example1": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "COHESION_ENVIRONMENT": "Local"
+      }
+    }
+  }
+}

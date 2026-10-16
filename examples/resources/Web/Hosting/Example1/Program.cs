@@ -1,13 +1,17 @@
 // Web.Hosting, Example 1: the smallest web application.
 //
-// WebApplication.CreateBuilder(args) reads configuration (appsettings.json, environment variables
-// and the command line) and, unless configuration declares listeners, listens on
-// http://localhost:5000. Build() creates the application, and RunAsync() serves until the process
-// ends. Run adds the last step of the request pipeline; this one answers every request.
+// WebApplication.CreateBuilder(args) reads configuration: appsettings.json, then
+// appsettings.{environment}.json, then COHESION_CONFIG__ environment variables, then the command
+// line. The listeners come from Http:Endpoints. dotnet run uses the Local environment
+// (Properties/launchSettings.json), whose file listens on http://localhost:5000; Development,
+// Staging and Production listen on port 8080 on every interface. Build() creates the application,
+// and RunAsync() serves until the process ends. Run adds the last step of the request pipeline;
+// this one answers every request.
 //
 //   dotnet run
 //   curl http://localhost:5000/anything
-//   dotnet run -- --Http:Endpoints:Main:Port=8080         (listen on port 8080 instead)
+//   dotnet run -- --Http:Endpoints:Main:Port=8081         (override the port from the command line)
+//   dotnet run --no-launch-profile                        (Production: http://0.0.0.0:8080)
 
 using System.Text;
 
