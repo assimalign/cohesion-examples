@@ -1,31 +1,25 @@
 // Web.Testing, Example 2 (the application under test).
 //
-// An ordinary Sdk.Web application. Its greeting comes from configuration, so a test can override
-// it with a command-line argument.
+// An ordinary Sdk.Web application whose composition lives in GreetingApplication, so its tests
+// compose the very same application in memory. Its greeting comes from configuration:
 //
-// The csproj enables orchestration, which FromProgram<Program>() needs. An orchestrated app binds
-// the endpoints its host assigns (a gateway, or the test factory) instead of localhost:5000, so a
-// bare `dotnet run` opens no port. Run it through its tests:
+//   dotnet run
+//   dotnet run -- --Greeting=Howdy
+//   curl http://localhost:5000/hello/cohesion
+//
+// Run its tests:
 //
 //   cd ../Tests
 //   dotnet test
 
-using Assimalign.Cohesion.Web;
 using Assimalign.Cohesion.Web.Hosting;
-using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-builder.Services.AddRouting();
+GreetingApplication.AddServices(builder);
 
 string greeting = builder.Configuration["Greeting"] ?? "Hello";
 
 await using WebApplication application = builder.Build();
-
-application.UseRouting();
-application.MapGet("/hello/{name}", (string name) => $"{greeting}, {name}!");
+GreetingApplication.MapEndpoints(application, greeting);
 
 await application.RunAsync();
-
-// Top-level statements compile to an internal Program class. Declaring it public lets the test
-// project name it: WebApplicationTestFactory.FromProgram<Program>().
-public partial class Program;

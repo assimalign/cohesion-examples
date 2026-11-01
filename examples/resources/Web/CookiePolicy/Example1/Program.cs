@@ -17,11 +17,12 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddCookiePolicy(cookies => cookies.Options.CheckConsentNeeded = _ => true);
 
 await using WebApplication application = builder.Build();
 
 // Ahead of everything that writes a cookie.
-application.UseCookiePolicy(options => options.CheckConsentNeeded = _ => true);
+application.UseCookiePolicy();
 application.UseRouting();
 
 application.MapGet("/", (IHttpContext context) =>

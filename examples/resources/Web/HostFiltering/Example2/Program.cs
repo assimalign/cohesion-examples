@@ -21,15 +21,17 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddForwardedHeaders(forwarded => forwarded.Options.Headers = ForwardedHeaderNames.XForwarded);
+builder.Services.AddHostFiltering(hosts =>
+{
+    hosts.Options.AllowedHosts.Add("shop.example");
+    hosts.Options.AllowedHosts.Add("*.shop.example");
+});
 
 await using WebApplication application = builder.Build();
 
-application.UseForwardedHeaders(options => options.Headers = ForwardedHeaderNames.XForwarded);
-application.UseHostFiltering(options =>
-{
-    options.AllowedHosts.Add("shop.example");
-    options.AllowedHosts.Add("*.shop.example");
-});
+application.UseForwardedHeaders();
+application.UseHostFiltering();
 application.UseRouting();
 
 application.MapGet("/", (IHttpContext context) => $"Welcome to {context.EffectiveHost.Value}!");

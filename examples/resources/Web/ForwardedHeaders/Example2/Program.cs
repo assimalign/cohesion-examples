@@ -19,19 +19,20 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddForwardedHeaders(forwarded =>
+{
+    forwarded.Options.Headers = ForwardedHeaderNames.All;
+    forwarded.Options.ForwardLimit = 2;
+
+    // Trust networks instead of individual proxy addresses.
+    forwarded.Options.KnownProxies.Clear();
+    forwarded.Options.KnownNetworks.Add(System.Net.IPNetwork.Parse("127.0.0.0/8"));
+    forwarded.Options.KnownNetworks.Add(System.Net.IPNetwork.Parse("10.0.0.0/8"));
+});
 
 await using WebApplication application = builder.Build();
 
-application.UseForwardedHeaders(options =>
-{
-    options.Headers = ForwardedHeaderNames.All;
-    options.ForwardLimit = 2;
-
-    // Trust networks instead of individual proxy addresses.
-    options.KnownProxies.Clear();
-    options.KnownNetworks.Add(System.Net.IPNetwork.Parse("127.0.0.0/8"));
-    options.KnownNetworks.Add(System.Net.IPNetwork.Parse("10.0.0.0/8"));
-});
+application.UseForwardedHeaders();
 application.UseRouting();
 
 application.MapGet("/whoami", (IHttpContext context) =>

@@ -23,17 +23,19 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddResponseCompression(compression =>
+{
+    compression.Options.EnableBrotli = false;
+    compression.Options.Level = CompressionLevel.Optimal;
+    compression.Options.MinimumResponseSizeBytes = 256;
+    compression.Options.MimeTypes.Add("application/x-ndjson");
+});
+builder.Services.AddRequestDecompression(decompression => decompression.Options.MaxDecompressedSizeBytes = 1024 * 1024);
 
 await using WebApplication application = builder.Build();
 
-application.UseResponseCompression(options =>
-{
-    options.EnableBrotli = false;
-    options.Level = CompressionLevel.Optimal;
-    options.MinimumResponseSizeBytes = 256;
-    options.MimeTypes.Add("application/x-ndjson");
-});
-application.UseRequestDecompression(options => options.MaxDecompressedSizeBytes = 1024 * 1024);
+application.UseResponseCompression();
+application.UseRequestDecompression();
 application.UseRouting();
 
 application.MapGet("/events", async (IHttpContext context) =>

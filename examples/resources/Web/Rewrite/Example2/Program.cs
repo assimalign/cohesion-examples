@@ -23,11 +23,9 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
-
-await using WebApplication application = builder.Build();
-
-application.UseRewrite(rules =>
+builder.Services.AddRewrite(rewrite =>
 {
+    RewriteOptions rules = rewrite.Options;
     rules.AddRedirectToLowercase();
     rules.AddRedirectToNoTrailingSlash();
     rules.AddRedirect(@"^/blog/(?<year>\d{4})/(?<slug>[a-z0-9-]+)$", "/posts/${slug}?year=${year}", HttpStatusCode.PermanentRedirect);
@@ -41,6 +39,10 @@ application.UseRewrite(rules =>
         }
     });
 });
+
+await using WebApplication application = builder.Build();
+
+application.UseRewrite();
 application.UseRouting();
 
 application.MapGet("/about", () => "About us.");

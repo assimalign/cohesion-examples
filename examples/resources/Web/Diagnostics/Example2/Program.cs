@@ -34,14 +34,16 @@ using ILoggerFactory loggerFactory = new LoggerFactoryBuilder()
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddHttpLogging(logging =>
+{
+    logging.UseLoggerFactory(loggerFactory);
+    logging.Options.Fields = HttpLoggingFields.Default | HttpLoggingFields.RequestQuery;
+    logging.Options.AllowedRequestHeaders.Add("X-Correlation-Id");
+});
 
 await using WebApplication application = builder.Build();
 
-application.UseHttpLogging(loggerFactory, options =>
-{
-    options.Fields = HttpLoggingFields.Default | HttpLoggingFields.RequestQuery;
-    options.AllowedRequestHeaders.Add("X-Correlation-Id");
-});
+application.UseHttpLogging();
 application.UseRouting();
 
 application.MapGet("/search", (string q) => $"Results for '{q}'.");

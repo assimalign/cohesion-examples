@@ -25,11 +25,7 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
-
-await using WebApplication application = builder.Build();
-
-application.UseRouting();
-application.UseCors(options => options
+builder.Services.AddCors(cors => cors.Options
     .AddDefaultPolicy(policy => policy.WithOrigins("https://app.example"))
     .AddPolicy("partners", policy => policy
         .WithOrigins("https://partner.example")
@@ -38,6 +34,11 @@ application.UseCors(options => options
         .WithExposedHeaders("X-Total-Count")
         .AllowCredentials()
         .SetPreflightMaxAge(TimeSpan.FromMinutes(10))));
+
+await using WebApplication application = builder.Build();
+
+application.UseRouting();
+application.UseCors();
 
 application.MapGet("/products", (IHttpContext context) =>
 {

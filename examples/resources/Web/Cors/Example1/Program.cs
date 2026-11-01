@@ -16,11 +16,12 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddCors(cors => cors.Options.AddDefaultPolicy(policy => policy.WithOrigins("https://app.example")));
 
 await using WebApplication application = builder.Build();
 
 application.UseRouting();
-application.UseCors(options => options.AddDefaultPolicy(policy => policy.WithOrigins("https://app.example")));
+application.UseCors();
 
 application.MapGet("/products", () => "Pen, Notebook, Stapler");
 

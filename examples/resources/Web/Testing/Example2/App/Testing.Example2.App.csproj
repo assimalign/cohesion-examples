@@ -1,7 +1,4 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.Web">
-  <PropertyGroup>
-    <!-- FromProgram<Program>() starts this Program.cs the way a gateway would: it waits for the
-         generated readiness probe and stops the app through the generated control plane. -->
-    <CohesionApplicationModel>enabled</CohesionApplicationModel>
-  </PropertyGroup>
+  <!-- An ordinary Sdk.Web application. GreetingApplication holds its composition, so the test project
+       composes the same application on the test factory's in-memory transport. -->
 </Project>

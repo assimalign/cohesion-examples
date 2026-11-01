@@ -19,19 +19,20 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
-
-await using WebApplication application = builder.Build();
-
-application.UseRouting();
-
 // One limiter per partition key; here the key is the client's address.
-application.UseRateLimiting(options => options.GlobalPolicy = RateLimitingPolicy.Create(
+builder.Services.AddRateLimiting(rateLimiting => rateLimiting.Options.GlobalPolicy = RateLimitingPolicy.Create(
     static (IHttpContext context) => RateLimitPartitionKeys.ClientAddress(context),
     static (string _) => new FixedWindowRateLimiter(new FixedWindowRateLimiterOptions
     {
         PermitLimit = 3,
         Window = TimeSpan.FromSeconds(10),
     })));
+
+await using WebApplication application = builder.Build();
+
+application.UseRouting();
+
+application.UseRateLimiting();
 
 application.MapGet("/", () => "Hello!");
 

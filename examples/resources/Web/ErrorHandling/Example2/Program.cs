@@ -27,39 +27,40 @@ using Assimalign.Cohesion.Web.Routing;
 Dictionary<int, string> orders = new() { [1] = "Pen", [2] = "Notebook", [3] = "Stapler" };
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+bool development = builder.Environment.IsDevelopment();
+
 builder.Services
     .AddRouting()
-    .AddErrorHandling(errors => errors.OnError(async (context, exception, cancellationToken) =>
+    .AddErrorHandling(errors =>
     {
-        ProblemDetails? problem = exception switch
+        errors.Options.IncludeDeveloperDetails = development;
+        errors.Options.OnException = (context, exception) =>
         {
-            KeyNotFoundException => ProblemDetails.FromStatus(HttpStatusCode.NotFound, exception.Message),
-            ArgumentException => ProblemDetails.FromStatus(HttpStatusCode.BadRequest, exception.Message),
-            _ => null,
+            Console.Error.WriteLine($"{context.Request.Method} {context.Request.Path.Value} failed: {exception.GetType().Name}: {exception.Message}");
+            return ValueTask.CompletedTask;
         };
-
-        if (problem is null)
+        errors.OnError(async (context, exception, cancellationToken) =>
         {
-            return false; // not handled here: the boundary writes its default 500
-        }
+            ProblemDetails? problem = exception switch
+            {
+                KeyNotFoundException => ProblemDetails.FromStatus(HttpStatusCode.NotFound, exception.Message),
+                ArgumentException => ProblemDetails.FromStatus(HttpStatusCode.BadRequest, exception.Message),
+                _ => null,
+            };
 
-        await context.Response.WriteProblemDetailsAsync(problem, cancellationToken);
-        return true;
-    }));
+            if (problem is null)
+            {
+                return false; // not handled here: the boundary writes its default 500
+            }
 
-bool development = builder.Environment.IsDevelopment();
+            await context.Response.WriteProblemDetailsAsync(problem, cancellationToken);
+            return true;
+        });
+    });
 
 await using WebApplication application = builder.Build();
 
-application.UseErrorHandling(options =>
-{
-    options.IncludeDeveloperDetails = development;
-    options.OnException = (context, exception) =>
-    {
-        Console.Error.WriteLine($"{context.Request.Method} {context.Request.Path.Value} failed: {exception.GetType().Name}: {exception.Message}");
-        return ValueTask.CompletedTask;
-    };
-});
+application.UseErrorHandling();
 application.UseStatusCodePages();
 application.UseRouting();
 

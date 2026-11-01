@@ -24,16 +24,17 @@ using InMemoryOutputCacheStore store = new();
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
-
-await using WebApplication application = builder.Build();
-
-application.UseRouting();
-application.UseOutputCache(store, options => options.AddPolicy("catalog", policy =>
+builder.Services.AddOutputCache(cache => cache.UseStore(store).Options.AddPolicy("catalog", policy =>
 {
     policy.Duration = TimeSpan.FromMinutes(5);
     policy.VaryByQuery("page");
     policy.Tag("catalog");
 }));
+
+await using WebApplication application = builder.Build();
+
+application.UseRouting();
+application.UseOutputCache();
 
 IRouterGroupBuilder catalog = application.MapGroup("/catalog").CacheOutput("catalog");
 

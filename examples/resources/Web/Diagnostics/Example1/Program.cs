@@ -22,11 +22,12 @@ using ILoggerFactory loggerFactory = new LoggerFactoryBuilder()
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddHttpLogging(logging => logging.UseLoggerFactory(loggerFactory));
 
 await using WebApplication application = builder.Build();
 
 // First, so requests that later middleware rejects are logged too.
-application.UseHttpLogging(loggerFactory);
+application.UseHttpLogging();
 application.UseRouting();
 
 application.MapGet("/hello", () => "Hello!");

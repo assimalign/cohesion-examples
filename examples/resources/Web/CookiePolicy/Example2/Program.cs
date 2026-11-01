@@ -19,16 +19,17 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddCookiePolicy(cookies =>
+{
+    cookies.Options.HttpOnly = CookieHttpOnlyPolicy.Always;
+    cookies.Options.SameSiteNoneWithoutSecure = CookieViolationAction.Reject;
+    cookies.Options.CheckConsentNeeded = context => context.Request.Headers["X-Region"].Value == "EU";
+    cookies.Options.OnRejected = rejection => Console.WriteLine($"Rejected cookie '{rejection.Cookie.Name}': {rejection.Reason}");
+});
 
 await using WebApplication application = builder.Build();
 
-application.UseCookiePolicy(options =>
-{
-    options.HttpOnly = CookieHttpOnlyPolicy.Always;
-    options.SameSiteNoneWithoutSecure = CookieViolationAction.Reject;
-    options.CheckConsentNeeded = context => context.Request.Headers["X-Region"].Value == "EU";
-    options.OnRejected = rejection => Console.WriteLine($"Rejected cookie '{rejection.Cookie.Name}': {rejection.Reason}");
-});
+application.UseCookiePolicy();
 application.UseRouting();
 
 application.MapGet("/", (IHttpContext context) =>

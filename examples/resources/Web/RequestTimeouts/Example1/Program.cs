@@ -20,11 +20,12 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddRequestTimeouts(timeouts => timeouts.Options.DefaultPolicy = new RequestTimeoutPolicy { Timeout = TimeSpan.FromSeconds(2) });
 
 await using WebApplication application = builder.Build();
 
 application.UseRouting();
-application.UseRequestTimeouts(TimeSpan.FromSeconds(2));
+application.UseRequestTimeouts();
 
 application.MapGet("/fast", () => "Done quickly.");
 

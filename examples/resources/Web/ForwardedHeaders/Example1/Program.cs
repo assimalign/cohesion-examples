@@ -18,11 +18,12 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddForwardedHeaders(forwarded => forwarded.Options.Headers = ForwardedHeaderNames.XForwarded);
 
 await using WebApplication application = builder.Build();
 
 // Ahead of everything that reads the client address, scheme or host.
-application.UseForwardedHeaders(options => options.Headers = ForwardedHeaderNames.XForwarded);
+application.UseForwardedHeaders();
 application.UseRouting();
 
 application.MapGet("/whoami", (IHttpContext context) => $"""

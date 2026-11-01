@@ -19,14 +19,16 @@ using Assimalign.Cohesion.Web.Sessions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddSessions(sessions =>
+{
+    sessions.UseStore(new InMemoryHttpSessionStore());
+    sessions.Options.CookieName = "example-session";
+    sessions.Options.IdleTimeout = TimeSpan.FromMinutes(5);
+});
 
 await using WebApplication application = builder.Build();
 
-application.UseSessions(new InMemoryHttpSessionStore(), options =>
-{
-    options.CookieName = "example-session";
-    options.IdleTimeout = TimeSpan.FromMinutes(5);
-});
+application.UseSessions();
 application.UseRouting();
 
 application.MapPost("/login", async (string user, IHttpContext context) =>
