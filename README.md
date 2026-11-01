@@ -3,7 +3,7 @@
 The examples mirror the cohesion repository's layout: `examples/libraries/<Area>` for library areas and `examples/resources/<Area>` for resource areas.
 
 - **[Web](examples/resources/Web/)**: two small applications for each Web package, 69 projects in all. Each one is a single `Program.cs`; its [README](examples/resources/Web/README.md) lists them.
-- **[ApplicationModel](examples/libraries/ApplicationModel/)**: one shop, a gateway and two Web resources, run by a gateway on a platform: [web-on-docker](examples/libraries/ApplicationModel/web-on-docker/) on a Docker-compatible engine, Podman's included, and [web-on-kubernetes](examples/libraries/ApplicationModel/web-on-kubernetes/) on a Kubernetes cluster.
+- **[ApplicationModel](examples/libraries/ApplicationModel/)**: one shop, a gateway and two Web resources, run by a gateway on a platform: [web-on-docker](examples/libraries/ApplicationModel/web-on-docker/) on a Docker-compatible engine, Podman's included, and [web-on-kubernetes](examples/libraries/ApplicationModel/web-on-kubernetes/) on a Kubernetes cluster. Both also run inside the gateway's own process, with no engine or cluster.
 
 ## Packages
 
