@@ -3,71 +3,32 @@
 The examples mirror the cohesion repository's layout: `examples/libraries/<Area>` for library areas and `examples/resources/<Area>` for resource areas.
 
 - **[Web](examples/resources/Web/)**: two small applications for each Web package, 69 projects in all. Each one is a single `Program.cs`; its [README](examples/resources/Web/README.md) lists them.
-- **ApplicationModel**: three consumer scaffolds implement [the Cohesion developer-experience design](https://github.com/assimalign/cohesion/blob/main/docs/DEVELOPER_EXPERIENCE_DESIGN.md), 52 executable projects, each with its own `Program.cs`.
+- **[ApplicationModel](examples/libraries/ApplicationModel/)**: one shop, a gateway and two Web resources, run by a gateway on a platform: [web-on-docker](examples/libraries/ApplicationModel/web-on-docker/) on a Docker-compatible engine, Podman's included, and [web-on-kubernetes](examples/libraries/ApplicationModel/web-on-kubernetes/) on a Kubernetes cluster.
 
-| Scaffold | Projects | Composition |
-| --- | ---: | --- |
-| [single-app](examples/libraries/ApplicationModel/single-app/) | 3 | Acme API + database, one gateway |
-| [k8s](examples/libraries/ApplicationModel/k8s/) | 25 | Platform, Identity, Networking and three zones, plus a root application set |
-| [k8s-federated](examples/libraries/ApplicationModel/k8s-federated/) | 24 | The same six applications with independent gateways |
+## Packages
 
-The SDK supplies executable defaults and, in every configuration, the self-contained host-runtime posture; project files carry no runtime properties. Root `Directory.Build.props` carries organization identity; each area sets `CohesionApplication` once. Every resource explicitly enables `CohesionApplicationModel`; gateways are always enabled by `Sdk.Gateway`. Resources have generated manifests, `Resource.*` accessors and their area's default control plane. There are no hand-written resource/gateway wrapper classes or SDK bridges.
+Every `Assimalign.Cohesion.*` package, the SDKs included, comes from the Assimalign GitHub Packages feed (`https://nuget.pkg.github.com/assimalign/index.json`), which `nuget.config` maps them to. Cohesion's CI publishes each `main` commit there as `10.0.0-preview.0.ci.<run>` and each same-repository pull request commit as `10.0.0-preview.0.pr.<pr>.<run>`. The root `global.json` pins the Cohesion SDKs the Web examples build on, and moving the pin moves every one of them to another build. Only the newest 20 `main` builds are kept, and a pull request's builds are deleted when it closes, so an old pin stops restoring.
 
-`Sdk.Gateway` generates `Manifests`, `Externals` and `Applications`, but no per-resource verb: each gateway composes a resource with its area's hand-written verb over the generated manifest (`builder.AddWeb(Manifests.AppAApi)`), which returns the typed descriptor for Web, Database, ConfigurationStore, SecretStore, IdentityHub, Rezolvr, LogSpace and VpnGateway. The five command-bearing areas used here have declarative verbs; Web, LogSpace and VpnGateway have none. Store, certificate-authority, trust and telemetry providers are explicit: a gateway that owns a store references its `<Area>.ApplicationModel.Orchestration` package and calls `builder.UseSecretStore(secrets).AsCertificateAuthority().AsTrustStore()` / `builder.UseConfigurationStore(config)`; Platform assigns `builder.Providers.Telemetry`; the root application set registers the same providers per member. Cross-application store sources are not supported yet, so IdentityHub's TLS bundle and signing keys and the VPN keys are `parameter:` mounts. Only Web, Database and ConfigurationStore have typed external binders: zones declare configuration namespaces themselves, while Identity and Networking gateways temporarily carry the zone audience/client and DNS commands.
+The root pin is a build of cohesion's [#1759](https://github.com/assimalign/cohesion/pull/1759), the application-model restart, whose Web area places every feature with a parameterless `Use<Feature>()` and configures it on its `builder.Services.Add<Feature>(...)` registration. Move it to a `main` build once that pull request merges.
 
-The rejected ownership shape is recorded verbatim:
+Each ApplicationModel example has its own `global.json` and `Directory.Build.props`, which pin the cohesion and cohesion-platforms CI builds it runs on, and its own solution, so it is not part of the root solution.
 
-> folder nesting never expresses ownership; the nested `Example.AppB.Gateway/Example.AppB.*` and copy-pasted `AppC` trees are removed; per-area gateways were added for Identity/Networking/Platform.
-
-## Local environment
-
-Every project has `Properties/launchSettings.json` selecting environment `Local` for developer-machine runs. The six zone APIs keep their overrides in `appsettings.Local.json`. Development uses strict deployed security. To supply an environment through shell variables, use `dotnet run --no-launch-profile` so launch settings do not override those values.
-
-`Development` is still a real, deployable environment name; `Local` is the developer-machine name. `--realize` is refused outside Local. A standalone process with neither environment variable still defaults to `Production`.
-
-`cohesion run` injects `--environment Local` only when no explicit argument or shell environment is supplied and the effective gateway is absent, `local` or `inprocess`. The CLI suppresses launch profiles when `COHESION_ENVIRONMENT` or `DOTNET_ENVIRONMENT` is supplied in the shell; a direct `dotnet run` requires `--no-launch-profile` explicitly.
+GitHub Packages needs a token with `read:packages` even to read public packages, and `gh auth login` does not grant that scope by default. Supply the token through the environment, never in a tracked file: `nuget.config`'s credential block names only the variables `GITHUB_USERNAME` and `GITHUB_PASSWORD`, and the credential guard rejects any other password value or token.
 
 ```powershell
-dotnet run --project examples/libraries/ApplicationModel/k8s/Zones/AppA/Example.AppA.Gateway -- --mode describe
-dotnet run --project examples/libraries/ApplicationModel/k8s/Gateway/Example.Gateway -- --mode describe
-dotnet run --project examples/libraries/ApplicationModel/single-app/Acme.Gateway -- --gateway local --mode run
-dotnet run --project examples/libraries/ApplicationModel/single-app/Acme.Gateway -- --gateway inprocess --mode run
+gh auth refresh -h github.com -s read:packages
+$env:GITHUB_USERNAME = '<github-user>'
+$env:GITHUB_PASSWORD = (gh auth token)
 ```
 
-The full zone declares four local resources: SecretStore, Database, API and SPA. Zone APIs declare HTTPS using their SecretStore's requested certificate; Acme and the SPAs retain HTTP. External ConfigurationStore commands require a reachable, authorized Platform gateway; a static localhost endpoint fallback supplies bindings but cannot substitute for that command channel. See the [landing-zone notes](examples/libraries/ApplicationModel/k8s/README.md) for runtime prerequisites and remaining gaps.
-
-The latest verification, against Cohesion `a8c0e22e` on `dev/dx-design-buildout` (local `10.0.0-preview.1.local` packs whose SDK targets match that commit), builds all 52 projects and describes the AppA zone gateway, the root application set, the federated Platform gateway and Acme. Live runs were not re-verified in that pass. The earlier report in [VERIFICATION.md](VERIFICATION.md), against Cohesion `5dfa1e3c`, recorded SecretStore's ambient content-root mismatch, SQL's principal/grant migration gap and the remaining SDK issues; no healthy HTTPS probe or delivered telemetry record has been established since. The 2026-09-26 explicit-provider changes postdate those packs: they were verified against the Cohesion working-tree assemblies only, and the solution builds again only after a fresh `Install-Local.ps1` pack (see the [VERIFICATION.md addendum](VERIFICATION.md#addendum-2026-09-26-explicit-providers)).
-
-## Packages and portable sources
-
-Every `Assimalign.Cohesion.*` package, the SDKs included, comes from the Assimalign GitHub Packages feed (`https://nuget.pkg.github.com/assimalign/index.json`), which `nuget.config` maps them to. Cohesion's CI publishes each `main` commit there as `10.0.0-preview.0.ci.<run>` and each same-repository pull request commit as `10.0.0-preview.0.pr.<pr>.<run>`. `global.json` pins all 20 Cohesion SDKs to one of those builds, and moving the pin moves every example to another one. Only the newest 20 `main` builds are kept, so an older pin stops restoring.
-
-GitHub Packages needs a token with `read:packages` even to read public packages. Supply it through the environment, never in a tracked file (the credential guard rejects one):
+or, equivalently, from NuGet's own variable:
 
 ```bash
 export NuGetPackageSourceCredentials_assimalign="Username=<github-user>;Password=$(gh auth token)"
 ```
 
-CI does the same with the repository secret `COHESION_PACKAGES_TOKEN` when it is defined, and with the workflow's own token otherwise. It verifies the generated solutions, restores, builds in Release, and runs the Web.Testing examples' tests.
+CI does the same with the repository secret `COHESION_PACKAGES_TOKEN` when it is defined, and with the workflow's own token otherwise. It verifies the generated solutions, restores, builds in Release, and runs the Web.Testing examples' tests, then builds each ApplicationModel example against its own pins.
 
-The platform providers (`Assimalign.Cohesion.ApplicationModel.Gateway.Containers`, `.Docker` and `.Kubernetes`) come from the same feed, but only at `10.0.0-preview.1`. The seven gateways selecting them pin `CohesionPlatformsVersion` themselves so root props remain identity-only. Because CI builds sort below the release they lead to, `10.0.0-preview.1` asks for a newer Cohesion than the pinned CI build, and the root `Directory.Build.targets` accepts that downgrade (NU1605) for those seven projects only, until cohesion-platforms publishes CI builds of its own. InProcess and ControlPlane resolve with the rest of Cohesion.
+## Solutions
 
-## Offline platform rendering and CLI
-
-Docker and Kubernetes providers are selected by the zone gateways and Acme. Networking stays Local because VpnGateway is non-composable; the root set also stays Local to demonstrate application-set model resolution. Identity and Platform retain Local/InProcess.
-
-```powershell
-dotnet run --project examples/libraries/ApplicationModel/k8s/Zones/AppA/Example.AppA.Gateway -- --gateway docker --mode render
-# Illustrative digest for OFFLINE rendering only; replace it with a real published digest before deployment.
-$image = 'example/gateway@sha256:' + ('0' * 64)
-dotnet run --project examples/libraries/ApplicationModel/k8s/Zones/AppA/Example.AppA.Gateway -- --gateway kubernetes --mode render --environment Development --cohesion-system-image $image --cohesion-system-storage 1Gi --control-plane-expose loadbalancer
-
-dotnet tool install Assimalign.Cohesion.Cli --tool-path .cohesion/tools --version 10.0.0-preview.0.ci.21 --configfile nuget.config
-# Run cohesion status from a gateway project directory; cohesion new --help lists template usage.
-```
-
-Render contacts neither a Docker daemon nor a cluster. Both providers first require each resource manifest to carry a published `artifact.image`; the checked-in examples have no published resource images, so the commands above currently stop at that validation gate. The supplied local feed has Windows runtime packs only, preventing the required Linux image publication in this pass.
-
-After publication, Docker's renderer produces Compose services/networks/volumes and `x-cohesion` metadata; its control plane stays in the gateway process. Kubernetes also requires the digest-pinned system image and storage size, and its renderer produces control-plane Services and an intentionally empty trust Secret. Those YAML objects were not observed in this verification because resource-image validation stopped rendering. Kubernetes requires JIT, so SDK auto-selection makes `PublishAot=false` for gateways selecting it; `IsAotCompatible` remains enabled.
-
-Run `pwsh ./setup.ps1` to regenerate the five solutions (one per ApplicationModel scaffold, `examples/resources/Web/Web.slnx`, and the root solution) and `pwsh ./setup.ps1 -Check` to verify them. No solution includes `_old/` or `.vs/`; both owner-retained folders remain untouched.
+`Assimalign.Cohesion.Examples.slnx` and `examples/resources/Web/Web.slnx` are generated: run `pwsh ./setup.ps1` after adding or removing a project, and `pwsh ./setup.ps1 -Check` to verify them. The ApplicationModel examples keep their own hand-written solutions. No solution includes `_old/` or `.vs/`.

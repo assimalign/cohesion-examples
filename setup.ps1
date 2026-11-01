@@ -144,30 +144,15 @@ function Test-OrWriteGeneratedFile {
     return $true
 }
 
+# The ApplicationModel examples (examples/libraries/ApplicationModel/*) are not listed: each pins its
+# own Cohesion and cohesion-platforms builds in its own global.json and keeps its own solution, so the
+# root solution cannot build them. build.yml builds them in a job of their own.
 $scaffolds = @(
-    [pscustomobject]@{
-        Name = 'single-app'
-        Root = Join-Path $repositoryRoot 'examples/libraries/ApplicationModel/single-app'
-        Solution = Join-Path $repositoryRoot 'examples/libraries/ApplicationModel/single-app/Acme.slnx'
-        Order = 0
-    },
-    [pscustomobject]@{
-        Name = 'k8s'
-        Root = Join-Path $repositoryRoot 'examples/libraries/ApplicationModel/k8s'
-        Solution = Join-Path $repositoryRoot 'examples/libraries/ApplicationModel/k8s/Example.K8s.slnx'
-        Order = 1
-    },
-    [pscustomobject]@{
-        Name = 'k8s-federated'
-        Root = Join-Path $repositoryRoot 'examples/libraries/ApplicationModel/k8s-federated'
-        Solution = Join-Path $repositoryRoot 'examples/libraries/ApplicationModel/k8s-federated/Example.Federated.slnx'
-        Order = 2
-    },
     [pscustomobject]@{
         Name = 'Web'
         Root = Join-Path $repositoryRoot 'examples/resources/Web'
         Solution = Join-Path $repositoryRoot 'examples/resources/Web/Web.slnx'
-        Order = 3
+        Order = 0
     }
 )
 
@@ -197,7 +182,7 @@ foreach ($scaffold in $scaffolds) {
 $rootSolutionPath = Join-Path $repositoryRoot 'Assimalign.Cohesion.Examples.slnx'
 $rootSolutionXml = ConvertTo-SolutionXml `
     -Entries $rootEntries `
-    -RootFiles @('.gitignore', 'Directory.Build.props', 'global.json', 'nuget.config', 'README.md', 'setup.ps1')
+    -RootFiles @('.gitignore', 'global.json', 'nuget.config', 'README.md', 'setup.ps1')
 if (Test-OrWriteGeneratedFile -Path $rootSolutionPath -Content $rootSolutionXml) {
     $generatedFilesAreStale = $true
 }
