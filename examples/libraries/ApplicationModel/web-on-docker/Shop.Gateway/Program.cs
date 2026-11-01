@@ -70,10 +70,10 @@ catch (OperationCanceledException)
     return;
 }
 
-// Without --endpoint, the platform resolved the engine as the docker CLI does: DOCKER_HOST, then the
-// platform's default.
-string engine = endpoint ?? Environment.GetEnvironmentVariable("DOCKER_HOST") ?? "the platform's default endpoint";
-Console.WriteLine(inProcess ? "The shop runs in this process:" : $"The shop runs on network '{network}' of the engine at {engine}:");
+// Without --endpoint, the platform resolves the engine itself, as the docker CLI does: DOCKER_HOST, then
+// its default. So the program names the engine's address only when --endpoint chose it.
+string engine = string.IsNullOrWhiteSpace(endpoint) ? "the engine DOCKER_HOST names, else the platform's default" : $"the engine at {endpoint}";
+Console.WriteLine(inProcess ? "The shop runs in this process:" : $"The shop runs on network '{network}' of {engine}:");
 foreach (IApplicationGatewayDeployment resource in gateway.Resources)
 {
     string address = resource.Outputs.TryGetValue(OutputName.Endpoint, out string? value) ? value : "(no endpoint)";
