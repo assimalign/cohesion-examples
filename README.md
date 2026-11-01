@@ -27,7 +27,7 @@ or, equivalently, from NuGet's own variable:
 export NuGetPackageSourceCredentials_assimalign="Username=<github-user>;Password=$(gh auth token)"
 ```
 
-CI does the same with the repository secret `COHESION_PACKAGES_TOKEN` when it is defined, and with the workflow's own token otherwise. It verifies the generated solutions, restores, builds in Release, and runs the Web.Testing examples' tests, then builds each ApplicationModel example against its own pins.
+CI does the same with the repository secret `COHESION_PACKAGES_TOKEN` when it is defined, and with the workflow's own token otherwise. It verifies the generated solutions, restores, builds in Release, and runs the Web.Testing examples' tests, then builds each ApplicationModel example against its own pins and runs it in process, checking that the storefront answers with data from `orders-api`.
 
 ## Solutions
 

@@ -5,7 +5,7 @@ name: examples-build
 # (10.0.0-preview.0.pr.<pr>.<run>) to the Assimalign GitHub Packages feed, which nuget.config maps
 # Assimalign.Cohesion.* to. Moving the pin moves every example to that build. The prune workflow
 # keeps the newest 20 main builds, so a pin older than that stops restoring. The application-model job
-# builds each examples/libraries/ApplicationModel example against its own pins.
+# builds each examples/libraries/ApplicationModel example against its own pins and runs it in process.
 #
 # Every `uses:` is pinned to a commit SHA with a trailing version comment, matching cohesion.
 
@@ -66,8 +66,8 @@ jobs:
 
   # The ApplicationModel examples pin their own cohesion and cohesion-platforms CI builds (each folder's
   # global.json and Directory.Build.props) and keep their own solutions, so the root solution cannot
-  # build them. This job restores and builds each against its pins; running them needs an engine or a
-  # cluster, which each example's README describes.
+  # build them. This job restores and builds each against its pins, then runs it in process, which
+  # needs no engine or cluster. Running one on its platform does, which each example's README describes.
   application-model:
     runs-on: ubuntu-24.04
     # Three small projects per example; resize from the first successful runs.
@@ -101,3 +101,66 @@ jobs:
 
       - name: Build
         run: dotnet build Shop.slnx --configuration Release --no-restore
+
+      # Runs the shop as `dotnet run --project Shop.Gateway -- --in-process` does, from the Release build,
+      # and proves the storefront answers through orders-api: it starts the gateway's executable, reads
+      # the storefront's address from the gateway's "Try: curl" line, requests it until it answers, then
+      # sends SIGINT, as Ctrl+C does, and expects a clean exit. The gateway's output is printed either way.
+      - name: Run in process
+        shell: pwsh
+        timeout-minutes: 5
+        run: |
+          $targetPath = dotnet msbuild Shop.Gateway/Shop.Gateway.csproj -getProperty:TargetPath -p:Configuration=Release
+          if ($LASTEXITCODE -ne 0) { throw "Reading the gateway's build output path failed (exit $LASTEXITCODE)." }
+          $targetPath = (@($targetPath) | Where-Object { $_.Trim() } | Select-Object -Last 1).Trim()
+          $start = [System.Diagnostics.ProcessStartInfo]::new([System.IO.Path]::ChangeExtension($targetPath, $null), '--in-process')
+          $start.RedirectStandardOutput = $true
+          $start.RedirectStandardError = $true
+          $gateway = [System.Diagnostics.Process]::Start($start)
+          $errors = $gateway.StandardError.ReadToEndAsync()
+          $output = [System.Collections.Generic.List[string]]::new()
+          $rest = $null
+          $failure = $null
+          try {
+            # The gateway prints the storefront's address once every resource has published.
+            $deadline = [DateTime]::UtcNow.AddMinutes(2)
+            $storefront = $null
+            while (-not $storefront) {
+              $line = $gateway.StandardOutput.ReadLineAsync()
+              if (-not $line.Wait([int][Math]::Max(0, ($deadline - [DateTime]::UtcNow).TotalMilliseconds))) {
+                throw 'The gateway printed no storefront address within 2 minutes.'
+              }
+              if ($null -eq $line.Result) { throw "The gateway's output ended before it printed the storefront's address." }
+              $output.Add($line.Result)
+              if ($line.Result -match '^Try: curl (\S+)') { $storefront = $Matches[1] }
+            }
+            $rest = $gateway.StandardOutput.ReadToEndAsync()
+
+            # An instance publishes before its server listens, so the first requests can arrive early.
+            $client = [System.Net.Http.HttpClient]::new()
+            $client.Timeout = [TimeSpan]::FromSeconds(10)
+            $answer = $null
+            for ($attempt = 1; -not $answer; $attempt++) {
+              try { $answer = $client.GetStringAsync($storefront).GetAwaiter().GetResult() }
+              catch {
+                if ($attempt -ge 30) { throw "The storefront at $storefront did not answer: $($_.Exception.Message)" }
+                Start-Sleep -Seconds 1
+              }
+            }
+            Write-Host "GET $storefront -> $answer"
+            if ($answer -notmatch '-> orders-api: \{.*"orders"') { throw "The storefront's answer carries no data from orders-api." }
+
+            /bin/kill -INT $gateway.Id
+            if (-not $gateway.WaitForExit(60000)) { throw 'The gateway did not stop within 60 seconds of SIGINT.' }
+            if ($gateway.ExitCode -ne 0) { throw "The gateway exited with $($gateway.ExitCode) after SIGINT." }
+          }
+          catch { $failure = $_ }
+          finally {
+            if (-not $gateway.HasExited) { $gateway.Kill($true); $gateway.WaitForExit() }
+            if ($rest) { $output.AddRange([string[]]($rest.Result -split '\r?\n')) }
+            Write-Host '--- gateway stdout ---'
+            $output | ForEach-Object { Write-Host $_ }
+            Write-Host '--- gateway stderr ---'
+            Write-Host $errors.Result
+          }
+          if ($failure) { throw $failure }
