@@ -1,6 +1,7 @@
 // The storefront resource: a Web application that reads the address of orders-api from its
 // configuration, where the gateway delivers its Orders:Url setting (the COHESION_CONFIG__Orders__Url
-// variable on its container), and answers with what orders-api returns.
+// variable on its container, or in its environment in the gateway's process), and answers with what
+// orders-api returns.
 //
 //   dotnet run --project Shop.Storefront -- --Orders:Url=http://localhost:5000 --Http:Endpoints:Main:Port=5002
 //   curl http://localhost:5002
@@ -10,6 +11,7 @@ using System.Net.Http;
 using System.Text;
 
 using Assimalign.Cohesion.ApplicationModel.Hosting.Docker;
+using Assimalign.Cohesion.ApplicationModel.Hosting.InProcess;
 using Assimalign.Cohesion.Http;
 using Assimalign.Cohesion.Web;
 using Assimalign.Cohesion.Web.Hosting;
@@ -17,7 +19,7 @@ using Assimalign.Cohesion.Web.Hosting.ApplicationModel;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 string orders = builder.Configuration["Orders:Url"] ?? throw new InvalidOperationException("The Orders:Url setting did not arrive.");
-builder.Services.AddResource("storefront", resource => resource.UseDocker());
+builder.Services.AddResource("storefront", resource => resource.UseDocker().UseInProcess());
 
 await using WebApplication application = builder.Build();
 using var client = new HttpClient { BaseAddress = new Uri(orders) };
