@@ -12,8 +12,8 @@ A gateway and two Web resources on the restarted Application Model ([assimalign/
 
 Everything restores from the Assimalign GitHub Packages feed, at the CI builds of the two draft pull requests:
 
-- [`global.json`](global.json) pins the Cohesion SDKs to a CI build of cohesion's [#1759](https://github.com/assimalign/cohesion/pull/1759). The in-process platform's packages, `Assimalign.Cohesion.ApplicationModel.Gateway.InProcess` and `Assimalign.Cohesion.ApplicationModel.Hosting.InProcess`, come from the same build: the projects reference them at the SDK's version, `$(CohesionVersion)`.
-- [`Directory.Build.props`](Directory.Build.props) pins `CohesionPlatformsVersion` to a CI build of cohesion-platforms' [#35](https://github.com/assimalign/cohesion-platforms/pull/35). That build depends on exactly the cohesion build above, so the two pins move together.
+- [`global.json`](global.json) pins the Cohesion SDKs to a CI build of cohesion's [#1784](https://github.com/assimalign/cohesion/pull/1784), which stacks on [#1759](https://github.com/assimalign/cohesion/pull/1759). The in-process platform's packages, `Assimalign.Cohesion.ApplicationModel.Gateway.InProcess` and `Assimalign.Cohesion.ApplicationModel.Hosting.InProcess`, come from the same build: the projects reference them at the SDK's version, `$(CohesionVersion)`.
+- [`Directory.Build.props`](Directory.Build.props) pins `CohesionPlatformsVersion` to a CI build of cohesion-platforms' [#36](https://github.com/assimalign/cohesion-platforms/pull/36), which stacks on [#35](https://github.com/assimalign/cohesion-platforms/pull/35). That build depends on exactly the cohesion build above, so the two pins move together.
 
 A pull request's CI packages are deleted when it closes, so move both pins to `main` builds once the pull requests merge. This folder has its own `global.json`, so it is not part of the root solution.
 

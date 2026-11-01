@@ -6,6 +6,6 @@
     pins move together.
   -->
   <PropertyGroup>
-    <CohesionPlatformsVersion>10.0.0-preview.0.pr.35.2</CohesionPlatformsVersion>
+    <CohesionPlatformsVersion>10.0.0-preview.0.pr.36.4</CohesionPlatformsVersion>
   </PropertyGroup>
 </Project>

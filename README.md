@@ -9,7 +9,7 @@ The examples mirror the cohesion repository's layout: `examples/libraries/<Area>
 
 Every `Assimalign.Cohesion.*` package, the SDKs included, comes from the Assimalign GitHub Packages feed (`https://nuget.pkg.github.com/assimalign/index.json`), which `nuget.config` maps them to. Cohesion's CI publishes each `main` commit there as `10.0.0-preview.0.ci.<run>` and each same-repository pull request commit as `10.0.0-preview.0.pr.<pr>.<run>`. The root `global.json` pins the Cohesion SDKs the Web examples build on, and moving the pin moves every one of them to another build. Only the newest 20 `main` builds are kept, and a pull request's builds are deleted when it closes, so an old pin stops restoring.
 
-The root pin is a build of cohesion's [#1759](https://github.com/assimalign/cohesion/pull/1759), the application-model restart, whose Web area places every feature with a parameterless `Use<Feature>()` and configures it on its `builder.Services.Add<Feature>(...)` registration. Move it to a `main` build once that pull request merges.
+The root pin is a build of cohesion's [#1784](https://github.com/assimalign/cohesion/pull/1784), which stacks on the application-model restart [#1759](https://github.com/assimalign/cohesion/pull/1759), whose Web area places every feature with a parameterless `Use<Feature>()` and configures it on its `builder.Services.Add<Feature>(...)` registration. Move it to a `main` build once those pull requests merge.
 
 Each ApplicationModel example has its own `global.json` and `Directory.Build.props`, which pin the cohesion and cohesion-platforms CI builds it runs on, and its own solution, so it is not part of the root solution.
 
