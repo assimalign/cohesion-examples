@@ -1,0 +1,7 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Gateway">
+	<!-- Sdk.Gateway makes the project an executable and references Assimalign.Cohesion.ApplicationModel.Gateway.
+	     The platform the shop runs on is the one package added here: the Kubernetes platform's gateway half. -->
+	<ItemGroup>
+		<PackageReference Include="Assimalign.Cohesion.ApplicationModel.Gateway.Kubernetes" Version="$(CohesionPlatformsVersion)" />
+	</ItemGroup>
+</Project>

@@ -1,0 +1,12 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Web">
+	<PropertyGroup>
+		<!-- dotnet publish -t:PublishContainer (publish-images.ps1) builds the resource's image and loads it into the
+		     local engine's image store. -->
+		<EnableSdkContainerSupport>true</EnableSdkContainerSupport>
+		<ContainerRepository>shop-storefront</ContainerRepository>
+		<ContainerImageTag>latest</ContainerImageTag>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Assimalign.Cohesion.ApplicationModel.Hosting.Docker" Version="$(CohesionPlatformsVersion)" />
+	</ItemGroup>
+</Project>

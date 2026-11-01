@@ -1,0 +1,11 @@
+<Project>
+  <!--
+    This example stands on its own: global.json pins the cohesion CI build it builds on, and this file
+    pins the cohesion-platforms CI build its projects reference, the gateway and instance halves of the
+    Kubernetes platform. That build depends on exactly the cohesion build global.json pins, so the two
+    pins move together.
+  -->
+  <PropertyGroup>
+    <CohesionPlatformsVersion>10.0.0-preview.0.pr.35.2</CohesionPlatformsVersion>
+  </PropertyGroup>
+</Project>

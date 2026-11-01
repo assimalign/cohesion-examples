@@ -1,8 +1,0 @@
-<Project>
-  <!-- Shared organization identity. Per-area Directory.Build.props files set CohesionApplication. -->
-  <PropertyGroup>
-    <CohesionOrganization>example</CohesionOrganization>                 <!-- image repository prefix: example/<resource-name> -->
-    <CohesionContainerRegistry>ghcr.io/example</CohesionContainerRegistry> <!-- empty = OCI archive on disk only -->
-    <VersionPrefix>1.4.0</VersionPrefix>
-  </PropertyGroup>
-</Project>
