@@ -1,19 +1,10 @@
-# Examples
+# ApplicationModel examples
 
-All three scaffolds use packaged Cohesion SDKs, executable `Program.cs` composition, generated manifests and default control planes. Folder-level `CohesionApplication` values express application boundaries.
+One shop on the restarted Application Model ([assimalign/cohesion#1759](https://github.com/assimalign/cohesion/pull/1759)), on two platforms. In both, a gateway program declares the application, `orders-api` with two instances and a `storefront` whose `Orders:Url` setting is `orders-api`'s endpoint, and runs it on its platform. Each resource is an ordinary Web program that makes itself a resource with `builder.Services.AddResource(name, resource => resource.Use<Platform>())`, and runs as a plain application outside a gateway.
 
-| Folder | Projects | Topology |
-| --- | ---: | --- |
-| [single-app](single-app/) | 3 | Acme API/database; Local, InProcess, Docker and Kubernetes providers |
-| [k8s](k8s/) | 25 | Six applications and one Local root application set |
-| [k8s-federated](k8s-federated/) | 24 | The same applications, each independently owned |
+| Example | Platform | Gateway half | Instance half |
+| --- | --- | --- | --- |
+| [web-on-docker](web-on-docker/) | A Docker-compatible engine on this machine, Podman's included: one container per replica | `builder.UseDocker(docker)`, `WithDockerReplicas(2)` | `resource.UseDocker()` |
+| [web-on-kubernetes](web-on-kubernetes/) | A Kubernetes cluster, through its API server: a Deployment and a Service per resource | `builder.UseKubernetes(kubernetes)`, `WithReplicas(2)` | `resource.UseKubernetes()` |
 
-Gateways compose each resource with its area's hand-written verb over the generated manifest and register their store, certificate-authority, trust and telemetry providers explicitly. Zones own their ConfigurationStore namespace commands; IdentityHub and Rezolvr lack typed external binders, so their owning gateways carry zone declarations. Zone HTTPS certificates are requested on each zone's SecretStore. Platform ConfigurationStore starts after its local LogSpace sink; zone APIs retain console logging because a gateway mints telemetry credentials only for a sink in its own application, and these examples do not point zones at the Platform LogSpace through `ResourceTelemetrySink.External` with an operator-supplied headers parameter.
-
-The rejected shape is explicit:
-
-> folder nesting never expresses ownership; the nested `Example.AppB.Gateway/Example.AppB.*` and copy-pasted `AppC` trees are removed; per-area gateways were added for Identity/Networking/Platform.
-
-Every executable's launch profile selects Local. Use `--no-launch-profile` with shell environment overrides. See the [root README](../README.md) for package feeds, offline rendering, the CLI, and deployed Development behavior. The full graphs still require their external command channels and operator-supplied secrets; model inspection is independent of those running services.
-
-Run `pwsh ../setup.ps1` from this directory after changing project membership, or `pwsh ../setup.ps1 -Check` to verify the generated solutions.
+The platform packages come from cohesion-platforms. Each example pins its cohesion build in its own `global.json` and its cohesion-platforms build in its own `Directory.Build.props`, keeps its own `Shop.slnx`, and shares nothing with the other; neither is part of the root solution. Its README says how to build its images and run it.

@@ -30,11 +30,12 @@ SemaphoreSlim sendGate = new(1, 1);
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddWebSockets(webSockets => webSockets.Options.KeepAliveInterval = TimeSpan.FromSeconds(15));
 
 await using WebApplication application = builder.Build();
 
 application.UseRouting();
-application.UseWebSockets(options => options.KeepAliveInterval = TimeSpan.FromSeconds(15));
+application.UseWebSockets();
 
 application.MapGet("/", async (IHttpContext context) =>
 {

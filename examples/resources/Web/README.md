@@ -78,7 +78,7 @@ Their settings files are empty on purpose, and their code is the server configur
 | [Server](Server) | Features the server gives every request | Listeners, protocols and limits |
 | [Sessions](Sessions) | A visit counter | Sign in with a session |
 | [StaticFiles](StaticFiles) | Serve a folder of files | A single-page application |
-| [Testing](Testing) | Test a pipeline in memory | Test the application's real `Program.cs` |
+| [Testing](Testing) | Test a pipeline in memory | Test the application's own composition |
 | [Validation](Validation) | Validate a request body | Nested rules and opting out |
 | [WebSockets](WebSockets) | An echo endpoint | Chat rooms with a subprotocol |
 

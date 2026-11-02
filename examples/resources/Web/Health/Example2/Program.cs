@@ -27,7 +27,7 @@ using Assimalign.Cohesion.Web.Routing;
 
 bool cacheWarm = false;
 
-IHealthCheckService health = HealthChecks.CreateBuilder()
+IHealthCheckService health = new HealthChecksBuilder()
     .AddCheck(
         "process",
         () => HealthCheckResult.Healthy(),

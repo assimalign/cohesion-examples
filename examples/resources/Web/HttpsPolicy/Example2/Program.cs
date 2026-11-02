@@ -33,15 +33,17 @@ builder.Server.UseServer(options =>
         new TlsServerOptions { AuthenticationOptions = { ServerCertificate = certificate } });
 });
 builder.Services.AddRouting();
+builder.Services.AddHttpsRedirection(redirection => redirection.Options.HttpsPort = 5001);
+builder.Services.AddHsts(hsts =>
+{
+    hsts.Options.MaxAge = TimeSpan.FromDays(180);
+    hsts.Options.IncludeSubDomains = true;
+});
 
 await using WebApplication application = builder.Build();
 
-application.UseHttpsRedirection(options => options.HttpsPort = 5001);
-application.UseHsts(options =>
-{
-    options.MaxAge = TimeSpan.FromDays(180);
-    options.IncludeSubDomains = true;
-});
+application.UseHttpsRedirection();
+application.UseHsts();
 application.UseRouting();
 
 application.MapGet("/", () => "Served over https.");

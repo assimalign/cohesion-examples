@@ -17,13 +17,15 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+// Redirects go ahead of rewrites.
+builder.Services.AddRewrite(rewrite => rewrite.Options
+    .AddRedirect("^/old-greeting$", "/greeting", HttpStatusCode.MovedPermanently)
+    .AddRewrite(@"^/legacy/items/(\d+)$", "/items/$1"));
 
 await using WebApplication application = builder.Build();
 
-// Ahead of routing, so routing sees the rewritten path. Redirects go ahead of rewrites.
-application.UseRewrite(rules => rules
-    .AddRedirect("^/old-greeting$", "/greeting", HttpStatusCode.MovedPermanently)
-    .AddRewrite(@"^/legacy/items/(\d+)$", "/items/$1"));
+// Ahead of routing, so routing sees the rewritten path.
+application.UseRewrite();
 application.UseRouting();
 
 application.MapGet("/greeting", () => "Hello!");

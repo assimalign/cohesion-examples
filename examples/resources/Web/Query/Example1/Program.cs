@@ -19,11 +19,12 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddQueryValidation(validation => validation.Options.AcceptedMediaTypes.Add(HttpMediaType.ApplicationJson));
 
 await using WebApplication application = builder.Build();
 
 application.UseRouting();
-application.UseQueryValidation(options => options.AcceptedMediaTypes.Add(HttpMediaType.ApplicationJson));
+application.UseQueryValidation();
 
 application.Map(HttpMethod.Query, "/people", async (IHttpContext context) =>
 {

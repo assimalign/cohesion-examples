@@ -4,7 +4,8 @@ name: examples-build
 # publishes each main commit (10.0.0-preview.0.ci.<run>) and same-repository pull request commit
 # (10.0.0-preview.0.pr.<pr>.<run>) to the Assimalign GitHub Packages feed, which nuget.config maps
 # Assimalign.Cohesion.* to. Moving the pin moves every example to that build. The prune workflow
-# keeps the newest 20 main builds, so a pin older than that stops restoring.
+# keeps the newest 20 main builds, so a pin older than that stops restoring. The application-model job
+# builds each examples/libraries/ApplicationModel example against its own pins.
 #
 # Every `uses:` is pinned to a commit SHA with a trailing version comment, matching cohesion.
 
@@ -34,6 +35,9 @@ jobs:
       # COHESION_PACKAGES_TOKEN (a classic personal access token with read:packages) wins when the
       # repository defines it; otherwise the workflow's own token is used.
       NuGetPackageSourceCredentials_assimalign: Username=${{ github.actor }};Password=${{ secrets.COHESION_PACKAGES_TOKEN || github.token }}
+      # nuget.config also names the credential through these two variables.
+      GITHUB_USERNAME: ${{ github.actor }}
+      GITHUB_PASSWORD: ${{ secrets.COHESION_PACKAGES_TOKEN || github.token }}
 
     steps:
       - name: Checkout
@@ -59,3 +63,41 @@ jobs:
       # Runs the test projects only: the Web.Testing examples.
       - name: Test
         run: dotnet test Assimalign.Cohesion.Examples.slnx --configuration Release --no-build
+
+  # The ApplicationModel examples pin their own cohesion and cohesion-platforms CI builds (each folder's
+  # global.json and Directory.Build.props) and keep their own solutions, so the root solution cannot
+  # build them. This job restores and builds each against its pins; running them needs an engine or a
+  # cluster, which each example's README describes.
+  application-model:
+    runs-on: ubuntu-24.04
+    # Three small projects per example; resize from the first successful runs.
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [web-on-docker, web-on-kubernetes]
+    defaults:
+      run:
+        working-directory: examples/libraries/ApplicationModel/${{ matrix.example }}
+    env:
+      NuGetPackageSourceCredentials_assimalign: Username=${{ github.actor }};Password=${{ secrets.COHESION_PACKAGES_TOKEN || github.token }}
+      # nuget.config also names the credential through these two variables.
+      GITHUB_USERNAME: ${{ github.actor }}
+      GITHUB_PASSWORD: ${{ secrets.COHESION_PACKAGES_TOKEN || github.token }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: examples/libraries/ApplicationModel/${{ matrix.example }}/global.json
+
+      - name: Restore
+        run: dotnet restore Shop.slnx --configfile ../../../../nuget.config
+
+      - name: Build
+        run: dotnet build Shop.slnx --configuration Release --no-restore

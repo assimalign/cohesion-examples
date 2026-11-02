@@ -32,21 +32,23 @@ ConcurrentDictionary<string, string> reports = new();
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddQueryValidation(validation =>
+{
+    validation.Options.AcceptedMediaTypes.Add(HttpMediaType.ApplicationJson);
+    validation.Options.SupportedResponseMediaTypes.Add(HttpMediaType.ApplicationJson);
+});
+
+// Tells the conditional middleware which version of the catalog a /products query would read.
+builder.Services.AddQueryConditionals(conditionals => conditionals.UseResourceValidators(context => ValueTask.FromResult<WebQueryResourceValidators?>(
+    context.Request.Path.Value == "/products"
+        ? new WebQueryResourceValidators { ETag = catalogVersion, HasCurrentRepresentation = true }
+        : null)));
 
 await using WebApplication application = builder.Build();
 
 application.UseRouting();
-application.UseQueryValidation(options =>
-{
-    options.AcceptedMediaTypes.Add(HttpMediaType.ApplicationJson);
-    options.SupportedResponseMediaTypes.Add(HttpMediaType.ApplicationJson);
-});
-
-// Tells the conditional middleware which version of the catalog a /products query would read.
-application.UseQueryConditionals(context => ValueTask.FromResult<WebQueryResourceValidators?>(
-    context.Request.Path.Value == "/products"
-        ? new WebQueryResourceValidators { ETag = catalogVersion, HasCurrentRepresentation = true }
-        : null));
+application.UseQueryValidation();
+application.UseQueryConditionals();
 
 application.Map(HttpMethod.Query, "/products", async (IHttpContext context) =>
 {

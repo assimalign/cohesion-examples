@@ -24,15 +24,16 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
-
-await using WebApplication application = builder.Build();
-
-application.UseRouting();
-application.UseRequestTimeouts(options => options.DefaultPolicy = new RequestTimeoutPolicy
+builder.Services.AddRequestTimeouts(timeouts => timeouts.Options.DefaultPolicy = new RequestTimeoutPolicy
 {
     Timeout = TimeSpan.FromSeconds(2),
     WriteProblemDetails = true,
 });
+
+await using WebApplication application = builder.Build();
+
+application.UseRouting();
+application.UseRequestTimeouts();
 
 application.MapGet("/report", async (CancellationToken cancellationToken) =>
 {

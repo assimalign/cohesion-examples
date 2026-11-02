@@ -1,0 +1,11 @@
+{
+  "sdk": {
+    "version": "10.0.300",
+    "rollForward": "latestFeature"
+  },
+  "msbuild-sdks": {
+    "Assimalign.Cohesion.Sdk": "10.0.0-preview.0.ci.185",
+    "Assimalign.Cohesion.Sdk.Gateway": "10.0.0-preview.0.ci.185",
+    "Assimalign.Cohesion.Sdk.Web": "10.0.0-preview.0.ci.185"
+  }
+}

@@ -22,12 +22,9 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
-
-await using WebApplication application = builder.Build();
-
-application.UseRouting();
-application.UseRateLimiting(options =>
+builder.Services.AddRateLimiting(rateLimiting =>
 {
+    RateLimitingOptions options = rateLimiting.Options;
     options.AddPolicy("per-key", RateLimitingPolicy.Create(
         static (IHttpContext context) => RateLimitPartitionKeys.Header(context, "X-Api-Key", fallback: "anonymous"),
         static (string _) => new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions
@@ -47,6 +44,11 @@ application.UseRateLimiting(options =>
         await rejection.Context.Response.Body.WriteAsync(Encoding.UTF8.GetBytes(body), cancellationToken);
     };
 });
+
+await using WebApplication application = builder.Build();
+
+application.UseRouting();
+application.UseRateLimiting();
 
 IRouterGroupBuilder api = application.MapGroup("/api").RequireRateLimiting("per-key");
 

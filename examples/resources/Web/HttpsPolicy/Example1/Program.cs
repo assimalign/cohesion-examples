@@ -18,10 +18,11 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddForwardedHeaders(forwarded => forwarded.Options.Headers = ForwardedHeaderNames.XForwarded);
 
 await using WebApplication application = builder.Build();
 
-application.UseForwardedHeaders(options => options.Headers = ForwardedHeaderNames.XForwarded);
+application.UseForwardedHeaders();
 application.UseHttpsRedirection();
 application.UseHsts();
 application.UseRouting();

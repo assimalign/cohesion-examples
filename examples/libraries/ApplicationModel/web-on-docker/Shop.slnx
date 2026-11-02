@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+    <File Path="publish-images.ps1" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Shop.Gateway/Shop.Gateway.csproj" />
+  <Project Path="Shop.Orders/Shop.Orders.csproj" />
+  <Project Path="Shop.Storefront/Shop.Storefront.csproj" />
+</Solution>

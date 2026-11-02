@@ -10,7 +10,7 @@
 using Assimalign.Cohesion.Web.Health;
 using Assimalign.Cohesion.Web.Hosting;
 
-IHealthCheckService health = HealthChecks.CreateBuilder()
+IHealthCheckService health = new HealthChecksBuilder()
     .AddCheck("self", () => HealthCheckResult.Healthy("The application is running."))
     .Build();
 

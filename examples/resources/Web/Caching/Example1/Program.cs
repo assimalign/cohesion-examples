@@ -16,11 +16,12 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddOutputCache(cache => cache.Options.AddBasePolicy(policy => policy.Duration = TimeSpan.FromSeconds(10)));
 
 await using WebApplication application = builder.Build();
 
 application.UseRouting();
-application.UseOutputCache(options => options.AddBasePolicy(policy => policy.Duration = TimeSpan.FromSeconds(10)));
+application.UseOutputCache();
 
 application.MapGet("/time", () => $"The time is {DateTime.UtcNow:HH:mm:ss.fff}.");
 

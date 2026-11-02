@@ -16,14 +16,15 @@ using Assimalign.Cohesion.Web.Routing;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddHostFiltering(hosts =>
+{
+    hosts.Options.AllowedHosts.Add("localhost");
+    hosts.Options.AllowedHosts.Add("127.0.0.1");
+});
 
 await using WebApplication application = builder.Build();
 
-application.UseHostFiltering(options =>
-{
-    options.AllowedHosts.Add("localhost");
-    options.AllowedHosts.Add("127.0.0.1");
-});
+application.UseHostFiltering();
 application.UseRouting();
 
 application.MapGet("/", (IHttpContext context) => $"Hello from {context.Request.Host.Value}!");

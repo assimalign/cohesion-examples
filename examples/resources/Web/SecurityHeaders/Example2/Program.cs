@@ -21,11 +21,9 @@ using Assimalign.Cohesion.Web.SecurityHeaders;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
-
-await using WebApplication application = builder.Build();
-
-application.UseSecurityHeaders(policy =>
+builder.Services.AddSecurityHeaders(headers =>
 {
+    SecurityHeadersPolicy policy = headers.Options;
     policy.ContentSecurityPolicy = ContentSecurityPolicy.Create(csp => csp
         .DefaultSrc(sources => sources.Self())
         .ScriptSrc(sources => sources.Nonce())
@@ -36,6 +34,10 @@ application.UseSecurityHeaders(policy =>
         .Disable("camera")
         .Disable("microphone"));
 });
+
+await using WebApplication application = builder.Build();
+
+application.UseSecurityHeaders();
 application.UseRouting();
 
 application.MapGet("/", async (IHttpContext context) =>

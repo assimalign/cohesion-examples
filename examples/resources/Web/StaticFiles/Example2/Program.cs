@@ -26,11 +26,13 @@ using PhysicalFileSystem downloads = new(Path.Combine(AppContext.BaseDirectory, 
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting();
+builder.Services.AddStaticFiles(files => files.Options.CacheControl = "public, max-age=3600");
+builder.Services.AddStaticFiles(files => files.UseFileSystem(downloads).Options.RequestPath = "/downloads");
 
 await using WebApplication application = builder.Build();
 
-application.UseStaticFiles(options => options.CacheControl = "public, max-age=3600");
-application.UseStaticFiles(downloads, options => options.RequestPath = "/downloads");
+// Places both mounts, in the order they were registered.
+application.UseStaticFiles();
 application.UseRouting();
 
 application.MapGet("/api/ping", () => "pong");
