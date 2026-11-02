@@ -10,7 +10,7 @@ A gateway and two Web resources on the restarted Application Model ([assimalign/
 
 ## Packages
 
-Everything restores from the Assimalign GitHub Packages feed, at two CI builds:
+Everything restores from the Assimalign GitHub Packages feed, at two `main` CI builds:
 
 - [`global.json`](global.json) pins the Cohesion SDKs to a `main` CI build of cohesion, taken after [#1759](https://github.com/assimalign/cohesion/pull/1759) and [#1784](https://github.com/assimalign/cohesion/pull/1784) merged. The in-process platform's packages, `Assimalign.Cohesion.ApplicationModel.Gateway.InProcess` and `Assimalign.Cohesion.ApplicationModel.Hosting.InProcess`, come from the same build: the projects reference them at the SDK's version, `$(CohesionVersion)`.
 - [`Directory.Build.props`](Directory.Build.props) pins `CohesionPlatformsVersion` to `ci.9`, a cohesion-platforms `main` CI build. That build depends on exactly the cohesion build above, so the two pins move together.
