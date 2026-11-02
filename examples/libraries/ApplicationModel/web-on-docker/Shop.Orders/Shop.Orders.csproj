@@ -8,5 +8,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Assimalign.Cohesion.ApplicationModel.Hosting.Docker" Version="$(CohesionPlatformsVersion)" />
+		<!-- The in-process platform's instance half: a gateway that references this project runs it in its own process. -->
+		<PackageReference Include="Assimalign.Cohesion.ApplicationModel.Hosting.InProcess" Version="$(CohesionVersion)" />
 	</ItemGroup>
 </Project>

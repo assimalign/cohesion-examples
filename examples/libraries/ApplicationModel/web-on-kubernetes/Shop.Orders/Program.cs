@@ -1,13 +1,16 @@
 // The orders-api resource: an ordinary Web application that makes itself a resource on the Kubernetes
-// platform. builder.Services.AddResource registers it like any other service. When the gateway runs it,
-// the instance publishes its manifest through a Lease before the application serves, and the gateway
-// manages it through the cluster's API server. Run with dotnet run, it is a plain Web application.
+// platform and the in-process platform. builder.Services.AddResource registers it like any other
+// service. When the gateway runs it in a pod, the instance publishes its manifest through a Lease
+// before the application serves, and the gateway manages it through the cluster's API server. When
+// the gateway runs it in the gateway's own process, the instance publishes over the in-process
+// channel and the gateway calls it directly. Run with dotnet run, it is a plain Web application.
 //
 //   dotnet run --project Shop.Orders
 //   curl http://localhost:5000
 
 using System.Text;
 
+using Assimalign.Cohesion.ApplicationModel.Hosting.InProcess;
 using Assimalign.Cohesion.ApplicationModel.Hosting.Kubernetes;
 using Assimalign.Cohesion.Http;
 using Assimalign.Cohesion.Web;
@@ -15,7 +18,7 @@ using Assimalign.Cohesion.Web.Hosting;
 using Assimalign.Cohesion.Web.Hosting.ApplicationModel;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-builder.Services.AddResource("orders-api", resource => resource.UseKubernetes());
+builder.Services.AddResource("orders-api", resource => resource.UseKubernetes().UseInProcess());
 
 await using WebApplication application = builder.Build();
 

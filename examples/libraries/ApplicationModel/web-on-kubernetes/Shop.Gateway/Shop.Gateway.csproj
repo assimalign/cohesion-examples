@@ -1,7 +1,15 @@
 <Project Sdk="Assimalign.Cohesion.Sdk.Gateway">
 	<!-- Sdk.Gateway makes the project an executable and references Assimalign.Cohesion.ApplicationModel.Gateway.
-	     The platform the shop runs on is the one package added here: the Kubernetes platform's gateway half. -->
+	     The shop runs on one of two platforms, each a package added here: the Kubernetes platform's gateway half, and
+	     the in-process platform, which runs the shop's programs inside the gateway's own process. -->
 	<ItemGroup>
 		<PackageReference Include="Assimalign.Cohesion.ApplicationModel.Gateway.Kubernetes" Version="$(CohesionPlatformsVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.ApplicationModel.Gateway.InProcess" Version="$(CohesionVersion)" />
+	</ItemGroup>
+	<!-- The programs the in-process platform runs. CohesionResource names the resource each one is; the build
+	     binds its program, so a bare UseInProcess() runs both. -->
+	<ItemGroup>
+		<ProjectReference Include="..\Shop.Orders\Shop.Orders.csproj" CohesionResource="orders-api" />
+		<ProjectReference Include="..\Shop.Storefront\Shop.Storefront.csproj" CohesionResource="storefront" />
 	</ItemGroup>
 </Project>

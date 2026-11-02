@@ -1,8 +1,10 @@
 // The orders-api resource: an ordinary Web application that makes itself a resource on the Docker
-// platform. builder.Services.AddResource registers it like any other service. When the gateway runs it
-// in a container, the instance publishes its manifest on its control-plane port, where the gateway
-// polls it, before the application serves, and the gateway manages it on that port. Run with dotnet
-// run, it is a plain Web application.
+// platform and the in-process platform. builder.Services.AddResource registers it like any other
+// service. When the gateway runs it in a container, the instance publishes its manifest on its
+// control-plane port, where the gateway polls it, before the application serves, and the gateway
+// manages it on that port. When the gateway runs it in the gateway's own process, the instance
+// publishes over the in-process channel and the gateway calls it directly. Run with dotnet run, it is
+// a plain Web application.
 //
 //   dotnet run --project Shop.Orders
 //   curl http://localhost:5000
@@ -10,13 +12,14 @@
 using System.Text;
 
 using Assimalign.Cohesion.ApplicationModel.Hosting.Docker;
+using Assimalign.Cohesion.ApplicationModel.Hosting.InProcess;
 using Assimalign.Cohesion.Http;
 using Assimalign.Cohesion.Web;
 using Assimalign.Cohesion.Web.Hosting;
 using Assimalign.Cohesion.Web.Hosting.ApplicationModel;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-builder.Services.AddResource("orders-api", resource => resource.UseDocker());
+builder.Services.AddResource("orders-api", resource => resource.UseDocker().UseInProcess());
 
 await using WebApplication application = builder.Build();
 
