@@ -10,12 +10,12 @@ A gateway and two Web resources on the restarted Application Model ([assimalign/
 
 ## Packages
 
-Everything restores from the Assimalign GitHub Packages feed, at the CI builds of the two draft pull requests:
+Everything restores from the Assimalign GitHub Packages feed, at two CI builds:
 
-- [`global.json`](global.json) pins the Cohesion SDKs to a CI build of cohesion's [#1784](https://github.com/assimalign/cohesion/pull/1784), which stacks on [#1759](https://github.com/assimalign/cohesion/pull/1759). The in-process platform's packages, `Assimalign.Cohesion.ApplicationModel.Gateway.InProcess` and `Assimalign.Cohesion.ApplicationModel.Hosting.InProcess`, come from the same build: the projects reference them at the SDK's version, `$(CohesionVersion)`.
-- [`Directory.Build.props`](Directory.Build.props) pins `CohesionPlatformsVersion` to a CI build of cohesion-platforms' [#36](https://github.com/assimalign/cohesion-platforms/pull/36), which stacks on [#35](https://github.com/assimalign/cohesion-platforms/pull/35). That build depends on exactly the cohesion build above, so the two pins move together.
+- [`global.json`](global.json) pins the Cohesion SDKs to a `main` CI build of cohesion, taken after [#1759](https://github.com/assimalign/cohesion/pull/1759) and [#1784](https://github.com/assimalign/cohesion/pull/1784) merged. The in-process platform's packages, `Assimalign.Cohesion.ApplicationModel.Gateway.InProcess` and `Assimalign.Cohesion.ApplicationModel.Hosting.InProcess`, come from the same build: the projects reference them at the SDK's version, `$(CohesionVersion)`.
+- [`Directory.Build.props`](Directory.Build.props) pins `CohesionPlatformsVersion` to a CI build of cohesion-platforms' [#36](https://github.com/assimalign/cohesion-platforms/pull/36), which stacks on [#35](https://github.com/assimalign/cohesion-platforms/pull/35), until those pull requests merge: cohesion-platforms has no `main` build of this code yet. That build depends on exactly the cohesion build above, so the two pins move together.
 
-A pull request's CI packages are deleted when it closes, so move both pins to `main` builds once the pull requests merge. This folder has its own `global.json`, so it is not part of the root solution, whose SDK pins serve the other examples.
+A pull request's CI packages are deleted when it closes, so move the platforms pin to a cohesion-platforms `main` build once #36 and #35 merge. Cohesion keeps only its newest 20 `main` builds, so move the cohesion pin to a newer one before it ages out; the two pins still move together. This folder has its own `global.json`, so it is not part of the root solution, whose SDK pins serve the other examples.
 
 The feed needs a token with `read:packages`, even for reads, and `gh auth login` does not grant that scope by default. Add it once, then hand the token to the root `nuget.config` through the environment:
 

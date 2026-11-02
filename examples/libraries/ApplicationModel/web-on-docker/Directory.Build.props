@@ -6,6 +6,6 @@
     move together.
   -->
   <PropertyGroup>
-    <CohesionPlatformsVersion>10.0.0-preview.0.pr.36.6</CohesionPlatformsVersion>
+    <CohesionPlatformsVersion>10.0.0-preview.0.pr.36.7</CohesionPlatformsVersion>
   </PropertyGroup>
 </Project>
