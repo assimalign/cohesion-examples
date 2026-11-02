@@ -20,12 +20,12 @@ The gateway runs on the engine's host and pulls. Each resource is one container 
 
 ## Packages
 
-Everything restores from the Assimalign GitHub Packages feed, at the CI builds of the two draft pull requests:
+Everything restores from the Assimalign GitHub Packages feed, at two `main` CI builds:
 
-- [`global.json`](global.json) pins the Cohesion SDKs to a CI build of cohesion's [#1759](https://github.com/assimalign/cohesion/pull/1759).
-- [`Directory.Build.props`](Directory.Build.props) pins `CohesionPlatformsVersion` to a CI build of cohesion-platforms' [#35](https://github.com/assimalign/cohesion-platforms/pull/35). That build depends on exactly the cohesion build above, so the two pins move together.
+- [`global.json`](global.json) pins the Cohesion SDKs to `ci.185`, a cohesion `main` CI build. No preview release is planned for a while, so the examples follow `main` CI builds.
+- [`Directory.Build.props`](Directory.Build.props) pins `CohesionPlatformsVersion` to `ci.9`, a cohesion-platforms `main` CI build. That build depends on exactly the cohesion build above, so the two pins move together.
 
-A pull request's CI packages are deleted when it closes, so move both pins to `main` builds once the pull requests merge. This folder has its own `global.json`, so it is not part of the root solution.
+Both repositories keep only their newest `main` builds, so move the pins to newer ones before they age out, together: a platforms build names the one cohesion build it was built against. This folder has its own `global.json`, so it is not part of the root solution.
 
 The feed needs a token with `read:packages`, even for reads, and `gh auth login` does not grant that scope by default. Add it once, then hand the token to the root `nuget.config` through the environment:
 
