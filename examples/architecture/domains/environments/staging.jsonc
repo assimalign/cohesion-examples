@@ -1,0 +1,67 @@
+// The staging environment: the same platform as prod, a different cluster and RM, different values. Everything that
+// differs between staging and prod is a value in this file (a parameter, a class or a size), never a branch in an
+// AppHost. prod.jsonc explains each key.
+{
+  "id": "/environments/staging",
+  "type": "Cohesion.Environments/environments",
+  "apiVersion": "2026-12-01",
+  "spec": {
+    "platform": { "name": "kubernetes", "apiVersion": "2026-12-01" },
+    "policy": {
+      "emulation": "deny",
+      "patches": "allow",
+      "rawManifests": "allow",
+      "rawKinds": { "allow": ["cert-manager.io/v1/Certificate"] },
+      "privileged": { "allow": ["networking"] }                       // [proposed] networking's site-vpn
+    },
+    "placement": {
+      // For a hub's private database only. No BookStore hub has one: identity names identity-db (prod.jsonc).
+      "statefulTiers": { "allowed": ["dedicated"], "default": "dedicated" },
+
+      // [proposed] Staging has one general pool and no dedicated stateful nodes, so the stateless and the stateful
+      // class select the same pool, and the stateful class has no toleration and a cheaper storage class. No AppHost
+      // changes for that: a class is a name to an AppHost, and its content is this environment's.
+      "classes": {
+        "stateless": { "kubernetes": { "nodeSelector": { "pool": "default" } } },
+        "stateful":  { "kubernetes": { "nodeSelector": { "pool": "default" }, "storageClass": "standard" } },
+        "edge":      { "kubernetes": {
+          "nodeSelector": { "pool": "edge" },
+          "tolerations":  [ { "key": "edge", "value": "true", "effect": "NoSchedule" } ],
+          "gatewayClass": "cilium" } }
+      },
+
+      // [proposed] The same three sizes as prod. A smaller staging would change these three lines and no AppHost.
+      "sizes": {
+        "small":  { "cpu": "250m", "memory": "256Mi", "memoryLimit": "512Mi" },
+        "medium": { "cpu": "500m", "memory": "1Gi",   "memoryLimit": "2Gi" },
+        "large":  { "cpu": "1",    "memory": "2Gi",   "memoryLimit": "4Gi" }
+      }
+    },
+    "groups": {
+      "networking": "platform",
+      "identity":   "platform",
+      "platform":   "platform",
+      "users":      "workloads",
+      "orders":     "workloads",
+      "storefront": "workloads"
+    },
+    "defaultGroup": "workloads",
+
+    // The same nine names as prod: every one is asked for by an AppHost, and no AppHost asks for another.
+    "parameters": {
+      "publicDomain":           "staging.bookstore.example",
+      "publicListenerHostname": "*.staging.bookstore.example",
+      "publicHost":             "www.staging.bookstore.example",
+      "identityHost":           "id.staging.bookstore.example",
+      "publicAddress":          "203.0.113.110",
+      "dnsAddress":             "203.0.113.153",
+      "corporateAuthority":     "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/v2.0",
+      "onPremPeer":             "198.51.100.20",
+      // The payment provider's sandbox. orders reads it twice: as a setting and as its egress rule's host.
+      "paymentsHost":           "sandbox.payments.example.com"
+    },
+    "secrets": {
+      "sitePresharedKey": { "application": "networking", "kubernetes": { "secret": "site-vpn", "key": "psk" } }
+    }
+  }
+}

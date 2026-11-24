@@ -1,0 +1,4 @@
+<Project Sdk="Assimalign.Viu.Sdk.Browser">
+	<!-- The browser application (was BookStore.App). Not a resource: BookStore.Storefront.Host serves its output. It
+	     calls /api/users and /api/orders on its own origin, so it holds no API address. -->
+</Project>

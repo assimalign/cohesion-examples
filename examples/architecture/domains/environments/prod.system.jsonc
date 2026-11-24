@@ -1,0 +1,24 @@
+// [proposed] What `cohesion system install|upgrade --environment prod` needs that the RM image cannot carry. v2 §5.1 sets
+// the endpoint, TLS secret, store size and backups in the RM program's System(...) call, but a stock image is shared by
+// every installation, so these values have to arrive with the command. The system record keeps them (v2 §9.4), so a
+// second operator or CI needs only this file and platform access.
+{
+  "type": "Cohesion.System/options",
+  "apiVersion": "2026-12-01",
+  "environment": "prod",
+
+  // The RM program's image: ResourceManager/BookStore.ResourceManager, published by pipelines/system.yml, which passes
+  // the digest with --image. Before anything else the command runs `system version` from this image and refuses if its
+  // composition hash differs from the local program's (v2 §9.4).
+  "image": "ghcr.io/acme/bookstore-resourcemanager",
+
+  "endpoint": "https://rm.prod.bookstore.internal",
+  "tls": { "secret": "bookstore-rm-tls" },             // bring your own; omit to have install create a private CA (v2 §9.9)
+
+  "store":   { "size": "50Gi", "storageClass": "fast-ssd" },
+  "backups": { "online": { "every": "PT6H", "keep": 28 },
+               "copy":   { "kubernetes": { "volumeSnapshotClass": "csi-snapshots" } } },
+
+  // Created in the RM once it is healthy, as the last step of install (v2 §9.5).
+  "environmentDocument": "prod.jsonc"
+}

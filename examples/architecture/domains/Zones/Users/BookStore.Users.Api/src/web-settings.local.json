@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": { "Users": "cohesion://localhost:5740/users" },
+  "Authentication": { "Authority": "https://id.bookstore.localhost:8443" },
+  "Telemetry": { "Endpoint": "" }
+}

@@ -1,0 +1,26 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Application">
+	<!-- The networking application's AppHost. Sdk.Application carries the root (CohesionApplication,
+	     app.Environment, app.Authorization), the fabric sections (app.Networking, app.Storage, app.Workloads) and
+	     the in-process platform. Every package adds its section to one namespace,
+	     Assimalign.Cohesion.Fabric.Providers, so Program.cs has one using. -->
+	<ItemGroup>
+		<!-- The Kubernetes platform: Platforms.Kubernetes, the app.Kubernetes section, the Kubernetes = new() { ... }
+		     blocks and their validators. No client: emit and validation run offline. -->
+		<PackageReference Include="Assimalign.Cohesion.Fabric.Kubernetes" Version="$(CohesionPlatformsVersion)" />
+		<!-- One package per provider: a physical type's package is its area's provider package (app.Rezolvr, and
+		     VpnGateway for app.Kubernetes.VpnGateway). [proposed] v2 as it stood had provider packages for Database
+		     and IdentityHub only. -->
+		<PackageReference Include="Assimalign.Cohesion.Rezolvr.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.VpnGateway.ResourceProvider" Version="$(CohesionVersion)" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- Add<Projects.X>(…): the programs this application runs. Sdk.Application generates one type under
+		     Projects for each referenced program, and `cohesion deploy` publishes each program as an image. -->
+		<ProjectReference Include="..\..\BookStore.Networking.Rezolvr\src\BookStore.Networking.Rezolvr.csproj" />
+		<ProjectReference Include="..\..\BookStore.Networking.VpnGateway\src\BookStore.Networking.VpnGateway.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- The file app.Kubernetes.AddManifest reads. YAML becomes JSON at emit; the RM accepts JSON only. -->
+		<None Include="deploy\public-certificate.yaml" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+</Project>

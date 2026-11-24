@@ -1,0 +1,132 @@
+# One application's pipeline, reusable. Each application calls it with its own name and AppHost (users.yml is one
+# caller). Illustrative: it lives here, not under .github/workflows, so nothing runs it.
+#
+# What it replaces: a gateway's bootstrap, apply and release modes, and the resident copy that followed a release
+# channel. A pipeline now does three things: test the document, ask the target ResourceManager what would happen, and
+# PUT. It holds no cluster credentials and no RM secret: it signs in to each RM with GitHub's OIDC token, as the
+# principal environments/access.jsonc makes Application Deployer of this one application.
+#
+# The commands are the AppHost's own. `cohesion emit <apphost>` is `dotnet run --project <apphost> -- emit`, and the
+# same holds for what-if and deploy. The AppHost takes `--view <platform>` on emit and `--env <name>` on what-if and
+# deploy, and refuses any other option. No option, of the AppHost or of the cohesion CLI, makes a deploy stop because
+# someone changed a resource through the API: the owner decided on 2026-11-22 that a pipeline gets no such gate (v2
+# §15, decision 36). See the last step.
+name: deploy-application
+
+on:
+  workflow_call:
+    inputs:
+      application: { required: true, type: string }     # users
+      # examples/architecture/domains/Zones/Users/BookStore.Users.AppHost
+      apphost:     { required: true, type: string }
+
+permissions:
+  contents: read
+  packages: write        # push the images `cohesion deploy` publishes
+  id-token: write        # the OIDC token each RM's IdentityHub federates
+
+env:
+  ContainerRegistry: ghcr.io/acme
+  GITHUB_USERNAME: ${{ github.actor }}
+  GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}           # read:packages for the Assimalign feed (nuget.config)
+
+jobs:
+  # Validation stage 1 (v2 §7.5), with no ResourceManager: every declaration's own checks, which throw on the line
+  # that wrote the value, then each targeted platform's view with its closure and validators. The views are also
+  # where a reviewer reads what the AppHost does not show: emit prints each effective value with its source
+  # (environment, type default, AppHost, hatch or platform rule).
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+      - run: dotnet tool install --global Assimalign.Cohesion.Cli
+      - run: dotnet test ${{ inputs.apphost }}/tests
+        if: hashFiles(format('{0}/tests/*.csproj', inputs.apphost)) != ''
+      - run: cohesion emit ${{ inputs.apphost }}/src --view inprocess
+      - run: cohesion emit ${{ inputs.apphost }}/src --view kubernetes
+
+  # Pull requests: stages 2 and 3 on prod's RM, with no writes: the plan and what would restart.
+  #
+  # It is also the one place a reviewer sees what prod would give each resource. The AppHost says `Size.Large` or
+  # nothing, and names no node pool or storage class. what-if is asked of prod's RM, where the size and the class
+  # resolve, and prints each effective value with its source. It prints one `reads` line for every resource of
+  # another application, with the AllowBind grant admission will require from that resource's owner.
+  #
+  # Decided by the owner on 2026-11-22 (v2 §15, decision 36): nothing lists the overrides this deployment would undo,
+  # which are the changes made through the API to the spec of a resource the document declares. [proposed] in v2
+  # (the same decision): what-if compares the document with what prod's RM stores now, so each such change is one
+  # more line under `Changes from code`, with the resource, the path, what it becomes and what applying it costs
+  # (live, restart or outage). The line has no mark, no author and no time, so a reviewer sees a line the pull request
+  # did not write. An override made after this job ran is undone by the deploy without having appeared here.
+  #
+  # The pull_request principal holds What-If Reader only: environments/whatIf and nothing else (v2 §10.6 and §15,
+  # decision 42). It does not hold the rights of the PUT it simulates.
+  #
+  # Not checked here: whether this application's deployer may do the deployment, so that a missing grant shows up in
+  # review and not during the deploy. The same holds for a role the AppHost defines or assigns beyond the deployer's
+  # own rights, which the deploy refuses with RoleEscalation (v2 §10.6, decision 44). Checking either here needs v2
+  # §7.5's --as <principal>, and the compiled AppHost surface gives what-if one option, --env. When the surface has
+  # --as, this step passes the deployer's subject, "federated:repo:acme/bookstore:environment:prod-<application>".
+  what-if:
+    if: github.event_name == 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+      - run: dotnet tool install --global Assimalign.Cohesion.Cli
+      - run: cohesion login --environment prod --endpoint https://rm.prod.bookstore.internal --federated github
+      - run: |
+          {
+            echo '```text'
+            cohesion what-if ${{ inputs.apphost }}/src --env prod
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-staging:
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    # The OIDC subject: repo:acme/bookstore:environment:staging-users
+    environment: staging-${{ inputs.application }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+      - run: dotnet tool install --global Assimalign.Cohesion.Cli
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
+      - run: cohesion login --environment staging --endpoint https://rm.staging.bookstore.internal --federated github
+      # Publishes the image of each project a declaration names (Add<Projects.X>), folds the digests into
+      # spec.artifacts and PUTs the document. For identity the document names two images: the hub's, and the one of
+      # identity-db's program. A hub with no database declared adds the store tier of its private database, an image
+      # the SDK builds at publish (decided by the owner on 2026-11-23; v2 §15, row 9), and no BookStore hub runs one.
+      # Whether this step still builds and pushes that image for BookStore's hub is an open question of v2 (§15): as
+      # v2 §8.9 is written it does. Admission refuses the PUT when the environment lacks a parameter, a secret, a
+      # class or a size the document uses, or a bind grant another application owes it, and when the document defines
+      # or assigns a role that goes beyond this pipeline's own rights (RoleEscalation).
+      # [proposed] deploy then follows the operation the PUT started, and a NeedsChange fault (ImageUnavailable,
+      # ConfigInvalid) fails this step at once, with the platform's own reason in the output. v2 §11.1 stops at the
+      # PUT.
+      # [proposed] in v2 (§15, decision 36): the operation names in its steps each resource the deploy changed.
+      # Decided by the owner on 2026-11-22 (the same decision): it does not list the overrides the deploy undid.
+      - run: cohesion deploy ${{ inputs.apphost }}/src --env staging
+
+  deploy-prod:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: prod-${{ inputs.application }}          # required reviewers live on this GitHub environment
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+      - run: dotnet tool install --global Assimalign.Cohesion.Cli
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
+      - run: cohesion login --environment prod --endpoint https://rm.prod.bookstore.internal --federated github
+      # A deploy undoes every change made through the API or a UI to the spec of the resources this document declares
+      # (v2 §6.1, decided 2026-11-19). One exception, decided the same day: a disk that was grown stays grown and is
+      # flagged (decision 37). Decided by the owner on 2026-11-22 (v2 §15, decision 36): whoever made such a change
+      # was not told that this step undoes it, nothing lists what the step undoes, and no option makes it stop for
+      # one. The pull request's what-if showed the changes that existed when it ran, each as a line under
+      # `Changes from code` ([proposed] in v2, decision 36). A change made since then is undone here all the same.
+      - run: cohesion deploy ${{ inputs.apphost }}/src --env prod

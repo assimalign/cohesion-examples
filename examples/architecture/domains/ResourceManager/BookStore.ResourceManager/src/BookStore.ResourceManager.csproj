@@ -1,0 +1,27 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.ResourceManager">
+	<!--
+		BookStore's ResourceManager: one image for staging and prod, both Kubernetes. NativeAOT, like every Cohesion
+		runtime (Sdk.ResourceManager sets PublishAot).
+
+		The composition is these references and nothing else: one platform's drivers, and the providers for the
+		resource types BookStore's AppHosts declare. Workloads, Networking and Storage come with the SDK. The catalog
+		is closed per build, so an AppHost that declares a type this RM was not built with fails admission
+		(TypeNotServed).
+
+		[proposed] The last six provider packages. v2 as it stood had IdentityHub's and Database's only; the sections
+		surface declares every program through its area's type (app.Web, app.LogSpace, app.Rezolvr and so on).
+	-->
+	<ItemGroup>
+		<PackageReference
+			Include="Assimalign.Cohesion.Fabric.Kubernetes.Drivers" Version="$(CohesionPlatformsVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.IdentityHub.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.Database.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.Web.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.LogSpace.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference
+			Include="Assimalign.Cohesion.ConfigurationStore.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.MessageHub.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.Rezolvr.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.VpnGateway.ResourceProvider" Version="$(CohesionVersion)" />
+	</ItemGroup>
+</Project>

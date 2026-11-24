@@ -1,0 +1,126 @@
+// The prod environment: one ResourceManager, one platform, every BookStore application.
+//
+// `cohesion system install --environment prod --file environments/prod.system.jsonc` creates it from this document once
+// the RM is healthy (v2 §9.5). Later changes are a PUT of this file by an Owner of /environments/prod:
+//   cohesion environment apply --environment prod --file environments/prod.jsonc        [proposed verb]
+//
+// What an AppHost reads from this file is three things, and it names only the first: the parameters and secrets it
+// asks for, the class its resource types belong to, and the size each resource ends up with. No AppHost names a node
+// pool, a toleration, a storage class, a gateway class, a CPU amount or a memory amount. Those are all here, under
+// placement, so "how much memory does orders-db get in prod" is answered by this file and by `what-if`, never by the
+// orders AppHost alone. AppHosts never change this file, and admission holds every PUT to its policy.
+{
+  "id": "/environments/prod",
+  "type": "Cohesion.Environments/environments",
+  "apiVersion": "2026-12-01",
+  "spec": {
+    // Exactly one platform, no mixing. An application whose AppHost does not list Platforms.Kubernetes in
+    // CreateBuilder is refused at admission (PlatformNotTargeted).
+    "platform": { "name": "kubernetes", "apiVersion": "2026-12-01" },
+
+    "policy": {
+      "emulation": "deny",              // a portable field kubernetes can only emulate fails admission here
+
+      // The hatch of orders-api adds a scrape annotation to the pod template the driver generates (AddToPodTemplate).
+      // A patch can only add, and only where this says allow.
+      "patches": "allow",
+
+      "rawManifests": "allow",
+      // networking's public-tls manifest. RBAC and webhooks stay denied.
+      "rawKinds": { "allow": ["cert-manager.io/v1/Certificate"] },
+
+      // [proposed] The applications that may run a privileged physical resource. networking declares site-vpn, a
+      // VpnGateway: the type itself needs the host's network and NET_ADMIN, and no line of the AppHost asks for them.
+      // The same list gates a hatch that writes HostNetwork or Capabilities; no BookStore AppHost writes either.
+      "privileged": { "allow": ["networking"] }
+    },
+
+    "placement": {
+      // What this line governs: a hub's private database, the store tier of a hub whose AppHost names no database
+      // (v2 §8.2). Such a tier is dedicated here: its own StatefulSet, volume and node pool. No AppHost pins a
+      // placement, so the default applies.
+      // No BookStore resource reads it today. BookStore's one hub names identity-db, so its placement is shared and
+      // this line is not consulted for it ([proposed] in v2, §8.2; §15, decision 46). identity-db is a database
+      // like users-db and orders-db: the stateful class below places it, and its size is in its own declaration.
+      // The line stays, because a hub declared without a database would be placed by it.
+      "statefulTiers": { "allowed": ["dedicated"], "default": "dedicated" },
+
+      // [proposed] Where each class runs. A resource type predefines its class, and no BookStore AppHost writes one:
+      //   stateless   users-api, orders-api, storefront, the identity web tier
+      //   stateful    users-db, orders-db, identity-db, logs, config, messages
+      //   edge        public-dns, site-vpn, and the two gateways (public, egress), which run no program
+      // A driver takes from a class what applies to the thing it builds: a node selector and tolerations for a
+      // program, the storage class for the volume a stateful type owns, the gateway class for a gateway and the node
+      // selector for an egress gateway. A document that uses a class this map lacks is refused at admission.
+      "classes": {
+        "stateless": { "kubernetes": { "nodeSelector": { "pool": "general" } } },
+        "stateful":  { "kubernetes": {
+          "nodeSelector": { "pool": "stateful" },
+          "tolerations":  [ { "key": "dedicated", "value": "stateful", "effect": "NoSchedule" } ],
+          "storageClass": "fast-ssd" } },
+        "edge":      { "kubernetes": {
+          "nodeSelector": { "pool": "edge" },
+          "tolerations":  [ { "key": "edge", "value": "true", "effect": "NoSchedule" } ],
+          "gatewayClass": "cilium" } }
+      },
+
+      // [proposed] What each size means: CPU request, memory request, memory limit. A type predefines its default
+      // size (small for a web application, medium for a database), and an AppHost writes Size only where the default
+      // is wrong: orders-db and identity-db are large. A document that uses a size this map lacks is
+      // refused at admission. Three sizes are coarser than a number, and two resources get more than their own figure:
+      // storefront's was 100m and 128Mi and it gets small; messages' was 512Mi of memory and it gets medium. An exact
+      // request needs the hatch (Requests, Limits), which no BookStore AppHost uses.
+      "sizes": {
+        "small":  { "cpu": "250m", "memory": "256Mi", "memoryLimit": "512Mi" },
+        "medium": { "cpu": "500m", "memory": "1Gi",   "memoryLimit": "2Gi" },
+        "large":  { "cpu": "1",    "memory": "2Gi",   "memoryLimit": "4Gi" }
+      }
+    },
+
+    // Which group each application is in. Groups are location metadata, never part of a resource id (option B2,
+    // v2 §10). Group resources and the grants on them are in access.jsonc. An application not listed lands in the
+    // default group.
+    "groups": {
+      "networking": "platform",
+      "identity":   "platform",
+      "platform":   "platform",
+      "users":      "workloads",
+      "orders":     "workloads",
+      "storefront": "workloads"
+    },
+    "defaultGroup": "workloads",
+
+    // Values that differ between environments on the same platform. An AppHost asks for one by name with
+    // app.Environment.Parameter("name"). It stays a reference at emit and resolves here at admission, and a name this
+    // map lacks is refused there. `emit` and `what-if` print every effective value with its source: environment, type
+    // default, AppHost, hatch or platform rule.
+    //
+    // Every name below is asked for by an AppHost, and every name an AppHost asks for is below:
+    //   networking   publicDomain, publicListenerHostname, publicAddress, dnsAddress, onPremPeer
+    //   identity     corporateAuthority, identityHost
+    //   users        publicHost
+    //   orders       publicHost, paymentsHost
+    //   storefront   publicHost
+    //   platform     none
+    // Node pools, the storage class and the gateway class are not parameters: placement.classes carries them.
+    "parameters": {
+      "publicDomain":           "bookstore.example",
+      "publicListenerHostname": "*.bookstore.example",
+      "publicHost":             "www.bookstore.example",
+      "identityHost":           "id.bookstore.example",
+      "publicAddress":          "203.0.113.10",
+      "dnsAddress":             "203.0.113.53",
+      "corporateAuthority":     "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/v2.0",
+      "onPremPeer":             "198.51.100.10",
+      "paymentsHost":           "api.payments.example.com"
+    },
+
+    // [proposed] Secret parameters: a name an AppHost asks for with app.Environment.Secret("name"), mapped to a
+    // platform secret the environment's admins create in the consuming application's namespace. The value never enters
+    // the RM's store or any document. A secret fits a setting and nothing else: networking reads this one as site-vpn's
+    // pre-shared key.
+    "secrets": {
+      "sitePresharedKey": { "application": "networking", "kubernetes": { "secret": "site-vpn", "key": "psk" } }
+    }
+  }
+}

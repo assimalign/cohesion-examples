@@ -1,0 +1,11 @@
+// [proposed] System options for staging. Same RM image as prod (one composition), different installation.
+{
+  "type": "Cohesion.System/options",
+  "apiVersion": "2026-12-01",
+  "environment": "staging",
+  "image": "ghcr.io/acme/bookstore-resourcemanager",
+  "endpoint": "https://rm.staging.bookstore.internal",
+  "store":   { "size": "10Gi", "storageClass": "standard" },
+  "backups": { "online": { "every": "PT24H", "keep": 7 } },
+  "environmentDocument": "staging.jsonc"
+}

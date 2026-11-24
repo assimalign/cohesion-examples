@@ -1,0 +1,20 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Database">
+	<!--
+		A plain Database program: no platform or application-model package, and no code of the hub's runtime.
+
+		[proposed] in v2 (§8.4; §15, decision 46): the hub's database package, under its advisory name. It declares
+		identity's whole database and ships the extension that Program.cs calls. It references Database.Sql and never
+		IdentityHub.Hosting. It stands where the orders and users database projects reference their domain library.
+
+		The image of this project (bookstore-identity-database) changes when this project or the Cohesion version
+		does. A new schema of identity arrives with a new version of the package, and this program's engine applies
+		it at start. A release of the hub alone never restarts the database.
+
+		Untested (v2 §8.3): Sdk.Database reads schema declarations from a project's own source, and this project has
+		none. A build stops with COHDBSDK101 only when a project sets CohesionDatabaseProject to true. This one does
+		not, so it builds, and it has no schema artifact for the hub's database.
+	-->
+	<ItemGroup>
+		<PackageReference Include="Assimalign.Cohesion.IdentityHub.Sql.Schema" Version="$(CohesionVersion)" />
+	</ItemGroup>
+</Project>

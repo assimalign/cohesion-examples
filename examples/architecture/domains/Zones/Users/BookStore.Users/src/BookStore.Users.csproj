@@ -1,0 +1,3 @@
+<Project Sdk="Assimalign.Cohesion.Sdk">
+	<!-- The Users domain library: types the API and the database schema share. Not a program, so not an image. -->
+</Project>

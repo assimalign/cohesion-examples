@@ -1,0 +1,4 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Rezolvr">
+	<!-- No platform package and no application-model package: the App kernel's agent ships in the framework, and it turns
+	     on only when the environment sets COHESION_CONTROL_PLANE_ENDPOINT. -->
+</Project>

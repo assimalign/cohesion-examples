@@ -1,0 +1,31 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Application">
+	<ItemGroup>
+		<PackageReference Include="Assimalign.Cohesion.Fabric.Kubernetes" Version="$(CohesionPlatformsVersion)" />
+		<!-- One package per provider: app.Database and app.Web. Web.ResourceProvider also types
+		     usersApp.Web.Get("users-api"). [proposed] Web.ResourceProvider: v2 as it stood ran a web program as a
+		     plain workload. -->
+		<PackageReference Include="Assimalign.Cohesion.Database.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.Web.ResourceProvider" Version="$(CohesionVersion)" />
+		<!-- Needed to name another application's resources with a type: identityApp.IdentityHub.Get("identity"),
+		     platformApp.LogSpace.Get("logs") and platformApp.MessageHub.Get("messages"). -->
+		<PackageReference Include="Assimalign.Cohesion.IdentityHub.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.LogSpace.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.MessageHub.ResourceProvider" Version="$(CohesionVersion)" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- Add<Projects.X>(…): the programs this application runs. -->
+		<ProjectReference Include="..\..\BookStore.Orders.Api\src\BookStore.Orders.Api.csproj" />
+		<ProjectReference Include="..\..\BookStore.Orders.Database\src\BookStore.Orders.Database.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- [proposed] localStandIn: Projects.X, the local stand-ins. Deduplicated by application name across the
+		     whole run: users pulls in identity, platform and networking too, and each is applied once. -->
+		<ProjectReference Include="..\..\..\Users\BookStore.Users.AppHost\src\BookStore.Users.AppHost.csproj" />
+		<ProjectReference
+			Include="..\..\..\..\Identity\BookStore.Identity.AppHost\src\BookStore.Identity.AppHost.csproj" />
+		<ProjectReference
+			Include="..\..\..\..\Platform\BookStore.Platform.AppHost\src\BookStore.Platform.AppHost.csproj" />
+		<ProjectReference
+			Include="..\..\..\..\Networking\BookStore.Networking.AppHost\src\BookStore.Networking.AppHost.csproj" />
+	</ItemGroup>
+</Project>

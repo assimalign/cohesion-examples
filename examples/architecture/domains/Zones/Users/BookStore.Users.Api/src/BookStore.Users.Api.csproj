@@ -1,0 +1,7 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Web">
+	<!-- A plain Web program. The old scaffold referenced ApplicationModel.Hosting.Kubernetes and .InProcess here; v2 needs
+	     neither: the App kernel's agent ships in the framework and is platform-neutral. -->
+	<ItemGroup>
+		<ProjectReference Include="..\..\BookStore.Users\src\BookStore.Users.csproj" />
+	</ItemGroup>
+</Project>

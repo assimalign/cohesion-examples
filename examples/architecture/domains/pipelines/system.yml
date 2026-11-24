@@ -1,0 +1,67 @@
+# The ResourceManager's own pipeline: the system layer (v2 §9). Manual, and the only pipeline that holds platform
+# credentials, because access to the platform is the real root of trust: whoever can write the cohesion-system namespace
+# controls the RM. Application pipelines never run this and never hold a kubeconfig.
+#
+# The RM does not upgrade itself. This job runs the RM program in system mode, from the same build as the image: it takes
+# the system lock, stops the old RM, backs up and migrates the store in one-shot tasks, starts the new RM in maintenance,
+# and restores the old one if the health gate fails. Applications keep running throughout; their agents never gate start.
+name: resource-manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment: { required: true, type: choice, options: [ staging, prod ] }
+      command:     { required: true, type: choice, options: [ status, upgrade, backup ] }
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+env:
+  ContainerRegistry: ghcr.io/acme
+  GITHUB_USERNAME: ${{ github.actor }}
+  GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+  PROGRAM: examples/architecture/domains/ResourceManager/BookStore.ResourceManager/src
+  ENVIRONMENTS: examples/architecture/domains/environments
+
+jobs:
+  system:
+    runs-on: ubuntu-latest
+    environment: system-${{ inputs.environment }}        # required reviewers; platform credentials are scoped to it
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+
+      # Platform-specific: however your cloud turns the job's OIDC token into cluster credentials.
+      - name: Cluster credentials
+        uses: azure/aks-set-context@v4
+        with:
+          resource-group: bookstore-${{ inputs.environment }}
+          cluster-name: bookstore-${{ inputs.environment }}
+
+      - name: Publish the RM image
+        if: inputs.command == 'upgrade'
+        id: image
+        run: |
+          dotnet publish "$PROGRAM" -t:PublishContainer -c Release
+          echo "digest=$(cat "$PROGRAM/obj/Release/container-digest.txt")" >> "$GITHUB_OUTPUT"
+
+      # `cohesion system <verb>` forwards to exactly this: the RM program with "system" as its first argument.
+      - name: status
+        if: inputs.command == 'status'
+        run: dotnet run --project "$PROGRAM" -- system status --environment ${{ inputs.environment }}
+
+      # One minor version at a time. The command first runs `system version` from the image and refuses if its
+      # composition hash differs from this build's, so a newer checkout never installs an older image.
+      - name: upgrade
+        if: inputs.command == 'upgrade'
+        run: >
+          dotnet run --project "$PROGRAM" -- system upgrade
+          --environment ${{ inputs.environment }}
+          --file "$ENVIRONMENTS/${{ inputs.environment }}.system.jsonc"
+          --image "ghcr.io/acme/bookstore-resourcemanager@${{ steps.image.outputs.digest }}"
+
+      - name: backup
+        if: inputs.command == 'backup'
+        run: dotnet run --project "$PROGRAM" -- system backup --environment ${{ inputs.environment }}

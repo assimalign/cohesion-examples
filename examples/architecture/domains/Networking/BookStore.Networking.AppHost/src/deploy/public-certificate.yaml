@@ -1,0 +1,20 @@
+# The public gateway's certificate, issued by cert-manager. A raw Kubernetes object, declared with
+# app.Kubernetes.AddManifest: it exists only in the kubernetes view, the environment's rawKinds policy must allow
+# cert-manager.io/v1/Certificate, and the driver applies it while impersonating the networking application's
+# ServiceAccount (v2 §7.6).
+#
+# No templating: v2 has no expression language (§6.3). The dnsNames below are overwritten at admission by the entries
+# of the AppHost's Values = new() { ["/spec/dnsNames/0"] = publicListenerHostname, ... }, which are JSON pointers with
+# values, the same data shape as a $ref.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: public-tls
+spec:
+  secretName: public-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt
+  dnsNames:
+    - set-by-the-apphost
+    - set-by-the-apphost

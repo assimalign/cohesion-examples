@@ -18,7 +18,11 @@ using Assimalign.Cohesion.Web.Hosting;
 using Assimalign.Cohesion.Web.Hosting.ApplicationModel;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-builder.Services.AddResource("orders-api", resource => resource.UseKubernetes().UseInProcess());
+builder.Services.AddResource("orders-api", resource =>
+{
+    resource.UseKubernetes();
+    resource.UseInProcess();
+});
 
 await using WebApplication application = builder.Build();
 

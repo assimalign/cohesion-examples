@@ -1,0 +1,105 @@
+// Who may do what, for every environment. One document for every RM: {env} resolves per environment, and an action in
+// a namespace an RM does not serve is a warning (Inapplicable), not an error (v2 §10.6).
+//
+//   cohesion access apply --environment prod --file environments/access.jsonc        [proposed verb]
+//
+// An Owner of the environment applies this file, never an application pipeline. An Access Administrator could apply
+// only a file whose assignments are the four kinds that delegate covers: Reader, Operator, a provider's Reader and a
+// provider's Operator (v2 §10.6 and §15, decision 44). The file defines no role, so no part of it takes
+// roleDefinitions/write. Two parts take more than an Owner holds:
+//   - Incident Responder and Cohesion.IdentityHub Administrator hold Sensitive actions. No wildcard matches one, so
+//     nobody holds them to pass on.
+//   - The deny takes denyAssignments/write, a guarded name that Owner does not hold. The file gives it to
+//     platform-admins through Deny Administrator.
+// An Owner of the environment assigns these three roles with --escalate (v2 §9.9 and §15, decision 44).
+// [Guessing] v2 does not say yet whether one apply may both give Deny Administrator and write the deny, so apply the
+// file twice until that is answered: the first apply gives the role, and the second, sent by a member of
+// platform-admins, writes the deny.
+//
+// Grants an application's own team needs on its own resources live in that application's AppHost and arrive with its
+// document: Lock, RoleAssignments and AllowBind inside a resource's declaration, and
+// app.Authorization.AddRoleAssignment for the whole application. Four AppHosts give their on-call group the
+// predefined Operator role that way (v2 §15, decision 29: read every resource in scope, invoke the actions its
+// provider marks for the role and change the settings marked operable). The orders AppHost also defines a role of
+// its own, which only its own document can assign (decision 43). None of that is repeated here.
+{
+  "apiVersion": "2026-12-01",
+
+  // Group resources: /environments/{env}/groups/{name}. Flat ids; the tree is spec.parent. The environment document
+  // places applications in them.
+  "groups": [
+    { "name": "platform" },
+    { "name": "workloads" }
+  ],
+
+  "roleAssignments": [
+    // The platform team owns the environment. No wildcard matches a Sensitive action, so Owner holds none of them: a
+    // role has to name each one. Cohesion.IdentityHub Administrator names the hub's four: rotate-signing-key,
+    // approve-schema-change, restore and rollback-store. The provider's Operator role holds none of them (v2 §10.6
+    // and §15, decision 42; the role names Administrator and Incident Responder are [proposed] in v2, decision 45).
+    //
+    // The last three act on a hub's private database. BookStore's hub names identity-db, a database its AppHost
+    // declares, so on it each of the three is refused with StoreNotOwned and only rotate-signing-key is left to this
+    // role ([proposed] in v2, §8.11 and §15, decision 46). Who may operate identity-db is said in the identity
+    // AppHost, as the orders AppHost says it for orders-db: the group identity-dba holds the Database provider's
+    // Operator on that database alone. That role holds no Sensitive action, and v2 names no restore and no
+    // approve-schema-change for a database, so no entry of this file can give anyone a restore of identity's data
+    // (an open question in v2 §15).
+    { "principal": { "group": "platform-admins" }, "role": "Owner", "scope": "/environments/{env}" },
+    { "principal": { "group": "platform-admins" }, "role": "Cohesion.IdentityHub Administrator", "scope": "/environments/{env}/groups/platform" },
+
+    // Incident Responder holds pause and resume on every type, and alone it only stops the reconcile. Together with
+    // Owner's private/read it is what a repair below a composite takes.
+    { "principal": { "group": "platform-admins" }, "role": "Incident Responder", "scope": "/environments/{env}" },
+
+    // Deny Administrator holds denyAssignments/write, a guarded name: no wildcard matches it, so Owner does not hold
+    // it. The deny at the end of this file takes it (v2 §10.6).
+    { "principal": { "group": "platform-admins" }, "role": "Deny Administrator", "scope": "/environments/{env}" },
+
+    // One pipeline principal per application: a GitHub Actions OIDC subject, federated into each RM's IdentityHub, so
+    // no RM secret lives in GitHub. Application Deployer is Contributor plus role assignments, locks and role
+    // definitions, limited to its own application and to roles within its own rights. CI never gets Owner.
+    { "principal": { "federated": { "issuer": "https://token.actions.githubusercontent.com", "subject": "repo:acme/bookstore:environment:{env}-networking" } },
+      "role": "Application Deployer", "scope": "/environments/{env}/applications/networking" },
+    { "principal": { "federated": { "issuer": "https://token.actions.githubusercontent.com", "subject": "repo:acme/bookstore:environment:{env}-identity" } },
+      "role": "Application Deployer", "scope": "/environments/{env}/applications/identity" },
+    { "principal": { "federated": { "issuer": "https://token.actions.githubusercontent.com", "subject": "repo:acme/bookstore:environment:{env}-platform" } },
+      "role": "Application Deployer", "scope": "/environments/{env}/applications/platform" },
+    { "principal": { "federated": { "issuer": "https://token.actions.githubusercontent.com", "subject": "repo:acme/bookstore:environment:{env}-users" } },
+      "role": "Application Deployer", "scope": "/environments/{env}/applications/users" },
+    { "principal": { "federated": { "issuer": "https://token.actions.githubusercontent.com", "subject": "repo:acme/bookstore:environment:{env}-orders" } },
+      "role": "Application Deployer", "scope": "/environments/{env}/applications/orders" },
+    { "principal": { "federated": { "issuer": "https://token.actions.githubusercontent.com", "subject": "repo:acme/bookstore:environment:{env}-storefront" } },
+      "role": "Application Deployer", "scope": "/environments/{env}/applications/storefront" },
+
+    // Pull requests: what-if only. What-If Reader holds environments/whatIf and nothing else (v2 §10.6 and §15,
+    // decision 42), so a pull request runs admission and preflight without the rights of the deploy it simulates.
+    // That a holder of this permission may also ask which checks another principal would fail (--as) is fine print
+    // and still [proposed] in v2 (decision 45).
+    { "principal": { "federated": { "issuer": "https://token.actions.githubusercontent.com", "subject": "repo:acme/bookstore:pull_request" } },
+      "role": "What-If Reader", "scope": "/environments/{env}" },
+
+    // Everyone in engineering can read everything except private children. Those are a composite's tiers and, now
+    // that every area has a resource type, the workload and the volume behind each physical resource: a Reader sees
+    // Cohesion.Web/applications/orders-api and not the workload under it.
+    { "principal": { "group": "engineering" }, "role": "Reader", "scope": "/environments/{env}" }
+  ],
+
+  // Deny wins over every allow. Nobody but break-glass deletes stateful resources in prod, Owners included. The
+  // platform application's three stores are resources of their own types and own their volumes, so their delete
+  // actions are named here; the volumes entry stays for the volumes those types own. identity-db is a database, so the
+  // first action covers it as it covers users-db and orders-db. Denies exclude principals by id only, so renaming or
+  // replacing the break-glass account cannot widen the exception.
+  "denies": [
+    { "name": "keep-prod-data",
+      "environments": ["prod"],
+      "scope": "/environments/prod",
+      "actions": [ "Cohesion.Database/databases/delete",
+                   "Cohesion.IdentityHub/identityHubs/delete",
+                   "Cohesion.LogSpace/logSpaces/delete",
+                   "Cohesion.ConfigurationStore/configurationStores/delete",
+                   "Cohesion.MessageHub/messageHubs/delete",
+                   "Cohesion.Storage/volumes/delete" ],
+      "excludePrincipals": [ { "id": "0193c2a0-0000-7000-8000-00000000b6a5" } ] }
+  ]
+}

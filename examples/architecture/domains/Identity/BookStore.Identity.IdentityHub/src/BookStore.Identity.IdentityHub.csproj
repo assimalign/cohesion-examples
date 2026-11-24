@@ -1,0 +1,18 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.IdentityHub">
+	<!--
+		A plain IdentityHub program: no platform or application-model package.
+
+		BookStore's identity AppHost names a database for this hub, identity-db, so the hub has no store tier: the
+		database's program is the project beside this one, BookStore.Identity.Database ([proposed] in v2, §8.9; §15,
+		decision 46). Whether publishing this project still builds the store tier's image is an open question of v2
+		(§15): as v2 §8.9 is written it does, and nothing deploys that image.
+
+		For a hub with no database declared, Sdk.IdentityHub also builds the private database's store tier at publish,
+		as a second image (bookstore-identity-identityhub-store), with no code from this project in it, and the program
+		in that image runs a small host of IdentityHub's own. The owner decided both on 2026-11-23 (v2 §15, row 9). The
+		designer counts one more thing as chosen with the second answer, because the owner was shown it first: that the
+		program is one generated call into IdentityHub's own store entry (v2 §1). [proposed] in v2 (§8.9): the names of
+		that entry and of that host, the image's name, and its fingerprint (the Cohesion version, the entry, the RID and
+		the format labels), by which it changes only when Cohesion does.
+	-->
+</Project>

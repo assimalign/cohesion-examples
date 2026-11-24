@@ -1,0 +1,6 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Web">
+	<!-- A plain Web program: no platform or application-model package. -->
+	<ItemGroup>
+		<ProjectReference Include="..\..\BookStore.Orders\src\BookStore.Orders.csproj" />
+	</ItemGroup>
+</Project>

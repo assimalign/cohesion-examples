@@ -1,0 +1,54 @@
+// The local environment. `dotnet run` on any AppHost starts an embedded ResourceManager with the in-process drivers and
+// creates this environment in it, with the same SQL store prod uses, under .cohesion/local/ (v2 §11.3). There is no
+// system layer locally: the AppHost process is the RM's host, and a crash in any program takes it down.
+//
+// Three things about a local run are rules of the in-process platform (v2 §11.3 has the reasons). No line of an
+// AppHost and no key of this file turns them on or off, so every local run prints them with the reason:
+//   - A physical resource runs one instance, whatever Scale its AppHost wrote, because every program shares one
+//     process and its statics. users-api (2), storefront (2), public-dns (2), the identity web tier (2) and orders-api
+//     (3 to 10) each run one here.
+//   - A gateway is a loopback listener with the development certificate.
+//   - Each application an AppHost references is applied to this same ResourceManager from its stand-in AppHost
+//     (localStandIn:), so a reference resolves to a real resource.
+{
+  "id": "/environments/local",
+  "type": "Cohesion.Environments/environments",
+  "apiVersion": "2026-12-01",
+  "spec": {
+    "platform": { "name": "inprocess", "apiVersion": "2026-12-01" },
+    "policy": {
+      "emulation": "allow",             // the gateways and exposures run as loopback listeners here (Emulated=True)
+      "patches": "allow",
+      "rawManifests": "deny"            // nothing to apply them to; kubernetes-only pieces are excluded, not refused
+    },
+    "placement": {
+      // What this line governs: a hub's private database, the store tier of a hub whose AppHost names no database
+      // (v2 §8.2). Embedded is honest here, because isolation is none (rule R4): such a store runs in the web tier's
+      // process. The local-prodlike profile overrides this to dedicated, to exercise the TLS path prod uses.
+      // No BookStore resource reads it today. BookStore's one hub names identity-db, so its placement is shared and
+      // this line is not consulted for it ([proposed] in v2, §8.2; §15, decision 46). identity-db is a resource of
+      // its own and runs here as users-db and orders-db do: its program on a thread of its own, one instance.
+      "statefulTiers": { "allowed": ["embedded", "dedicated"], "default": "embedded" },
+
+      // [proposed] Classes and sizes mean nothing in one process: there is no node to select, no storage class, no
+      // gateway class, and no request or limit to set. The names are here, empty, only because admission refuses a
+      // class or a size the environment lacks. A local run therefore says nothing about whether orders-db fits in
+      // large, or whether the edge pool exists.
+      "classes": { "stateless": {}, "stateful": {}, "edge": {} },
+      "sizes":   { "small": {}, "medium": {}, "large": {} }
+    },
+
+    // [proposed] Admission asks an environment only for the names its platform's view of a document reads. These are
+    // the six the in-process view reads. publicAddress, dnsAddress, onPremPeer and the secret sitePresharedKey are
+    // absent: only a Kubernetes block or site-vpn reads them, and neither is in this view. site-vpn is declared
+    // through app.Kubernetes because this platform cannot give a program the host's network.
+    "parameters": {
+      "publicDomain":           "bookstore.localhost",
+      "publicListenerHostname": "*.bookstore.localhost",     // *.localhost resolves to loopback (RFC 6761)
+      "publicHost":             "www.bookstore.localhost",
+      "identityHost":           "id.bookstore.localhost",
+      "corporateAuthority":     "",                          // no upstream: IdentityHub signs the developer in itself
+      "paymentsHost":           "localhost"
+    }
+  }
+}

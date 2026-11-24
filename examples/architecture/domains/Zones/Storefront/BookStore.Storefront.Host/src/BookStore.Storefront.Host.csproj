@@ -1,0 +1,7 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Web">
+	<!-- A plain Web program (was BookStore.App.Host): no platform or application-model package. -->
+	<ItemGroup>
+		<!-- The browser application's published output becomes this program's web root. -->
+		<ProjectReference Include="..\..\BookStore.Storefront\src\BookStore.Storefront.csproj" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+</Project>

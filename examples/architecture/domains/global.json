@@ -1,0 +1,21 @@
+{
+  "sdk": {
+    "version": "10.0.400",
+    "rollForward": "latestFeature"
+  },
+  "msbuild-sdks": {
+    "Assimalign.Cohesion.Sdk": "10.1.0-preview.1",
+    "Assimalign.Cohesion.Sdk.Application": "10.1.0-preview.1",
+    "Assimalign.Cohesion.Sdk.ResourceManager": "10.1.0-preview.1",
+    "Assimalign.Cohesion.Sdk.Web": "10.1.0-preview.1",
+    "Assimalign.Cohesion.Sdk.Database": "10.1.0-preview.1",
+    "Assimalign.Cohesion.Sdk.IdentityHub": "10.1.0-preview.1",
+    "Assimalign.Cohesion.Sdk.LogSpace": "10.1.0-preview.1",
+    "Assimalign.Cohesion.Sdk.ConfigurationStore": "10.1.0-preview.1",
+    "Assimalign.Cohesion.Sdk.MessageHub": "10.1.0-preview.1",
+    "Assimalign.Cohesion.Sdk.Rezolvr": "10.1.0-preview.1",
+    "Assimalign.Cohesion.Sdk.VpnGateway": "10.1.0-preview.1",
+    "Assimalign.Viu.Sdk": "10.0.0-preview.1.ci.14",
+    "Assimalign.Viu.Sdk.Browser": "10.0.0-preview.1.ci.14"
+  }
+}

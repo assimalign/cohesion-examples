@@ -1,0 +1,17 @@
+# The users application's pipeline: the whole file. One like it per application; only the two inputs and the paths differ.
+name: users
+
+on:
+  pull_request:
+    paths: [ "examples/architecture/domains/Zones/Users/**" ]
+  push:
+    branches: [ main ]
+    paths: [ "examples/architecture/domains/Zones/Users/**" ]
+
+jobs:
+  users:
+    uses: ./.github/workflows/deploy-application.yml
+    with:
+      application: users
+      apphost: examples/architecture/domains/Zones/Users/BookStore.Users.AppHost
+    secrets: inherit

@@ -1,0 +1,7 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Database">
+	<!-- A plain Database program: no platform or application-model package. Its image changes only when the schema or
+	     Cohesion does, which is what keeps users-api releases from restarting the database. -->
+	<ItemGroup>
+		<ProjectReference Include="..\..\BookStore.Users\src\BookStore.Users.csproj" />
+	</ItemGroup>
+</Project>

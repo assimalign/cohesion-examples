@@ -1,0 +1,22 @@
+<Project Sdk="Assimalign.Cohesion.Sdk.Application">
+	<ItemGroup>
+		<PackageReference Include="Assimalign.Cohesion.Fabric.Kubernetes" Version="$(CohesionPlatformsVersion)" />
+		<!-- One package per provider: app.Database and app.IdentityHub. IdentityHub.ResourceProvider carries the hub's
+		     declaration with its tiers, its roles and its validators: the same provider code the ResourceManager runs
+		     at admission. Database.ResourceProvider is here since the hub names a database this file declares:
+		     app.Database.Add<Projects.X>("identity-db", ...) and Store = new() { Database = identityDb }. -->
+		<PackageReference Include="Assimalign.Cohesion.Database.ResourceProvider" Version="$(CohesionVersion)" />
+		<PackageReference Include="Assimalign.Cohesion.IdentityHub.ResourceProvider" Version="$(CohesionVersion)" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- Add<Projects.X>(…): the programs this application runs, the database's and the hub's. -->
+		<ProjectReference Include="..\..\BookStore.Identity.Database\src\BookStore.Identity.Database.csproj" />
+		<ProjectReference Include="..\..\BookStore.Identity.IdentityHub\src\BookStore.Identity.IdentityHub.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- [proposed] localStandIn: Projects.X is another application's AppHost, applied as a stand-in in local
+		     runs only. `cohesion deploy` never publishes or PUTs it. -->
+		<ProjectReference
+			Include="..\..\..\Networking\BookStore.Networking.AppHost\src\BookStore.Networking.AppHost.csproj" />
+	</ItemGroup>
+</Project>

@@ -1,0 +1,125 @@
+<Solution>
+	<Configurations>
+		<Platform Name="Any CPU" />
+		<Platform Name="x64" />
+		<Platform Name="x86" />
+	</Configurations>
+	<Folder Name="/domains/">
+		<File Path="Directory.Build.props" />
+		<File Path="global.json" />
+		<File Path="nuget.config" />
+		<File Path="README.md" />
+	</Folder>
+	<Folder Name="/domains/environments/">
+		<File Path="environments/access.jsonc" />
+		<File Path="environments/local.jsonc" />
+		<File Path="environments/prod.jsonc" />
+		<File Path="environments/prod.system.jsonc" />
+		<File Path="environments/staging.jsonc" />
+		<File Path="environments/staging.system.jsonc" />
+	</Folder>
+	<Folder Name="/domains/pipelines/">
+		<File Path="pipelines/deploy-application.yml" />
+		<File Path="pipelines/system.yml" />
+		<File Path="pipelines/users.yml" />
+	</Folder>
+	<Folder Name="/domains/Identity/" />
+	<Folder Name="/domains/Identity/BookStore.Identity.AppHost/" />
+	<Folder Name="/domains/Identity/BookStore.Identity.AppHost/src/">
+		<Project Path="Identity/BookStore.Identity.AppHost/src/BookStore.Identity.AppHost.csproj" />
+	</Folder>
+	<Folder Name="/domains/Identity/BookStore.Identity.Database/" />
+	<Folder Name="/domains/Identity/BookStore.Identity.Database/src/">
+		<Project Path="Identity/BookStore.Identity.Database/src/BookStore.Identity.Database.csproj" />
+	</Folder>
+	<Folder Name="/domains/Identity/BookStore.Identity.IdentityHub/" />
+	<Folder Name="/domains/Identity/BookStore.Identity.IdentityHub/src/">
+		<Project Path="Identity/BookStore.Identity.IdentityHub/src/BookStore.Identity.IdentityHub.csproj" />
+	</Folder>
+	<Folder Name="/domains/Networking/" />
+	<Folder Name="/domains/Networking/BookStore.Networking.AppHost/" />
+	<Folder Name="/domains/Networking/BookStore.Networking.AppHost/src/">
+		<Project Path="Networking/BookStore.Networking.AppHost/src/BookStore.Networking.AppHost.csproj" />
+	</Folder>
+	<Folder Name="/domains/Networking/BookStore.Networking.Rezolvr/" />
+	<Folder Name="/domains/Networking/BookStore.Networking.Rezolvr/src/">
+		<Project Path="Networking/BookStore.Networking.Rezolvr/src/BookStore.Networking.Rezolvr.csproj" />
+	</Folder>
+	<Folder Name="/domains/Networking/BookStore.Networking.VpnGateway/" />
+	<Folder Name="/domains/Networking/BookStore.Networking.VpnGateway/src/">
+		<Project Path="Networking/BookStore.Networking.VpnGateway/src/BookStore.Networking.VpnGateway.csproj" />
+	</Folder>
+	<Folder Name="/domains/Platform/" />
+	<Folder Name="/domains/Platform/BookStore.Platform.AppHost/" />
+	<Folder Name="/domains/Platform/BookStore.Platform.AppHost/src/">
+		<Project Path="Platform/BookStore.Platform.AppHost/src/BookStore.Platform.AppHost.csproj" />
+	</Folder>
+	<Folder Name="/domains/Platform/BookStore.Platform.ConfigurationStore/" />
+	<Folder Name="/domains/Platform/BookStore.Platform.ConfigurationStore/src/">
+		<Project Path="Platform/BookStore.Platform.ConfigurationStore/src/BookStore.Platform.ConfigurationStore.csproj" />
+	</Folder>
+	<Folder Name="/domains/Platform/BookStore.Platform.LogSpace/" />
+	<Folder Name="/domains/Platform/BookStore.Platform.LogSpace/src/">
+		<Project Path="Platform/BookStore.Platform.LogSpace/src/BookStore.Platform.LogSpace.csproj" />
+	</Folder>
+	<Folder Name="/domains/Platform/BookStore.Platform.MessageHub/" />
+	<Folder Name="/domains/Platform/BookStore.Platform.MessageHub/src/">
+		<Project Path="Platform/BookStore.Platform.MessageHub/src/BookStore.Platform.MessageHub.csproj" />
+	</Folder>
+	<Folder Name="/domains/ResourceManager/" />
+	<Folder Name="/domains/ResourceManager/BookStore.ResourceManager/" />
+	<Folder Name="/domains/ResourceManager/BookStore.ResourceManager/src/">
+		<Project Path="ResourceManager/BookStore.ResourceManager/src/BookStore.ResourceManager.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/" />
+	<Folder Name="/domains/Zones/Orders/" />
+	<Folder Name="/domains/Zones/Orders/BookStore.Orders.Api/" />
+	<Folder Name="/domains/Zones/Orders/BookStore.Orders.Api/src/">
+		<Project Path="Zones/Orders/BookStore.Orders.Api/src/BookStore.Orders.Api.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/Orders/BookStore.Orders.AppHost/" />
+	<Folder Name="/domains/Zones/Orders/BookStore.Orders.AppHost/src/">
+		<Project Path="Zones/Orders/BookStore.Orders.AppHost/src/BookStore.Orders.AppHost.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/Orders/BookStore.Orders.Database/" />
+	<Folder Name="/domains/Zones/Orders/BookStore.Orders.Database/src/">
+		<Project Path="Zones/Orders/BookStore.Orders.Database/src/BookStore.Orders.Database.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/Orders/BookStore.Orders/" />
+	<Folder Name="/domains/Zones/Orders/BookStore.Orders/src/">
+		<Project Path="Zones/Orders/BookStore.Orders/src/BookStore.Orders.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/Storefront/" />
+	<Folder Name="/domains/Zones/Storefront/BookStore.Storefront.AppHost/" />
+	<Folder Name="/domains/Zones/Storefront/BookStore.Storefront.AppHost/src/">
+		<Project Path="Zones/Storefront/BookStore.Storefront.AppHost/src/BookStore.Storefront.AppHost.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/Storefront/BookStore.Storefront.Host/" />
+	<Folder Name="/domains/Zones/Storefront/BookStore.Storefront.Host/src/">
+		<Project Path="Zones/Storefront/BookStore.Storefront.Host/src/BookStore.Storefront.Host.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/Storefront/BookStore.Storefront/" />
+	<Folder Name="/domains/Zones/Storefront/BookStore.Storefront/src/">
+		<Project Path="Zones/Storefront/BookStore.Storefront/src/BookStore.Storefront.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/Users/" />
+	<Folder Name="/domains/Zones/Users/BookStore.Users.Api/" />
+	<Folder Name="/domains/Zones/Users/BookStore.Users.Api/src/">
+		<Project Path="Zones/Users/BookStore.Users.Api/src/BookStore.Users.Api.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/Users/BookStore.Users.AppHost/" />
+	<Folder Name="/domains/Zones/Users/BookStore.Users.AppHost/src/">
+		<Project Path="Zones/Users/BookStore.Users.AppHost/src/BookStore.Users.AppHost.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/Users/BookStore.Users.AppHost/tests/">
+		<Project Path="Zones/Users/BookStore.Users.AppHost/tests/BookStore.Users.AppHost.Tests.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/Users/BookStore.Users.Database/" />
+	<Folder Name="/domains/Zones/Users/BookStore.Users.Database/src/">
+		<Project Path="Zones/Users/BookStore.Users.Database/src/BookStore.Users.Database.csproj" />
+	</Folder>
+	<Folder Name="/domains/Zones/Users/BookStore.Users/" />
+	<Folder Name="/domains/Zones/Users/BookStore.Users/src/">
+		<Project Path="Zones/Users/BookStore.Users/src/BookStore.Users.csproj" />
+	</Folder>
+</Solution>

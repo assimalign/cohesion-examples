@@ -1,0 +1,35 @@
+<Project>
+  <!--
+    BookStore's shared build settings. Illustrative: no Cohesion build carries the v2 surface yet (README.md).
+
+    global.json pins the Cohesion SDKs. CohesionPlatformsVersion pins the one cohesion-platforms build that two kinds of
+    project take a Kubernetes package from:
+      - every AppHost: Assimalign.Cohesion.Fabric.Kubernetes, the contract (Platforms.Kubernetes, app.Kubernetes, the
+        Kubernetes = new() { ... } blocks, the validators). It carries no Kubernetes client, so an AppHost can emit and
+        validate the kubernetes view offline.
+      - the ResourceManager program: Assimalign.Cohesion.Fabric.Kubernetes.Drivers, the drivers and their client.
+
+    Every program is a container image. `cohesion deploy` publishes each project an AppHost names as a type argument,
+    Add<Projects.X>(…) (dotnet publish -t:PublishContainer), pushes it to $(ContainerRegistry) as its project name in
+    lower case with dashes (bookstore-users-api), and folds each digest into the document's spec.artifacts before the
+    PUT. BookStore's IdentityHub keeps its data in a database its AppHost declares, so identity deploys two such
+    images, bookstore-identity-identityhub and bookstore-identity-database. A hub with no database declared has one
+    image more, the store tier of its private database, which Sdk.IdentityHub builds at publish (decided by the owner
+    on 2026-11-23; v2 §15, row 9). For BookStore's hub it would be bookstore-identity-identityhub-store. Whether
+    publishing BookStore's hub still builds that image, which nothing would deploy, is an open question of v2 (§15):
+    as v2 §8.9 is written it does. AppHosts are never images: Sdk.Application turns container support off.
+  -->
+  <PropertyGroup>
+    <CohesionPlatformsVersion>10.1.0-preview.1</CohesionPlatformsVersion>
+    <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
+    <ContainerRegistry Condition="'$(ContainerRegistry)' == ''">localhost:5001</ContainerRegistry>
+    <ContainerRepository>$(MSBuildProjectName.Replace('.', '-').ToLowerInvariant())</ContainerRepository>
+
+    <!--
+      [proposed] The environment `dotnet run` on any AppHost creates in its embedded ResourceManager: the in-process
+      platform, local parameter values, and the embedded placement for a hub's private database, which no BookStore
+      hub has. One file, so every AppHost and every stand-in application it pulls in see the same local environment.
+    -->
+    <CohesionLocalEnvironment>$(MSBuildThisFileDirectory)environments/local.jsonc</CohesionLocalEnvironment>
+  </PropertyGroup>
+</Project>
